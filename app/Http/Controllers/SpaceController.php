@@ -36,6 +36,7 @@ class SpaceController extends Controller
         $space->update($request->validated());
 
         return response()->json($space);
+        
     }
     public function destroy(Space $space)
     {
