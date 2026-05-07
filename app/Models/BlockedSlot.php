@@ -15,6 +15,12 @@ class BlockedSlot extends Model
         'end_time',
         'reason'
     ];
+
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
+
     public function space()
     {
         return $this->belongsTo(Space::class);

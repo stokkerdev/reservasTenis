@@ -16,6 +16,7 @@
                                     v-model="form.space_id"
                                     id="space_id"
                                     required
+                                    @change="fetchAvailableBlocks"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 >
                                     <option value="">Seleccionar cancha</option>
@@ -26,30 +27,44 @@
                                 <p v-if="errors.space_id" class="text-red-600 text-sm mt-1">{{ errors.space_id }}</p>
                             </div>
 
-                            <!-- Fecha y hora de inicio -->
+                            <!-- Fecha del Bloqueo -->
                             <div>
-                                <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">Inicio del Bloqueo</label>
+                                <label for="blocked_date" class="block text-sm font-medium text-gray-700 mb-2">Fecha del Bloqueo</label>
                                 <input
-                                    v-model="form.start_time"
-                                    type="datetime-local"
-                                    id="start_time"
+                                    v-model="selectedDate"
+                                    type="date"
+                                    id="blocked_date"
                                     required
+                                    @change="fetchAvailableBlocks"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.start_time" class="text-red-600 text-sm mt-1">{{ errors.start_time }}</p>
+                                <p v-if="errors.date" class="text-red-600 text-sm mt-1">{{ errors.date }}</p>
                             </div>
 
-                            <!-- Fecha y hora de fin -->
-                            <div>
-                                <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">Fin del Bloqueo</label>
-                                <input
-                                    v-model="form.end_time"
-                                    type="datetime-local"
-                                    id="end_time"
-                                    required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
-                                />
-                                <p v-if="errors.end_time" class="text-red-600 text-sm mt-1">{{ errors.end_time }}</p>
+                            <!-- Bloques horarios disponibles -->
+                            <div v-if="availableBlocks.length > 0">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Selecciona un Bloque Horario</label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <div v-for="block in availableBlocks" :key="block.start_time" class="relative">
+                                        <input
+                                            type="radio"
+                                            :id="`block-${block.start_time}`"
+                                            :value="block"
+                                            v-model="selectedBlock"
+                                            class="hidden peer"
+                                        />
+                                        <label
+                                            :for="`block-${block.start_time}`"
+                                            class="block w-full p-3 border border-gray-300 rounded-lg text-center cursor-pointer peer-checked:bg-tennis-green peer-checked:text-white peer-checked:border-tennis-green hover:bg-gray-50 transition"
+                                        >
+                                            {{ formatTime(block.start_time) }} - {{ formatTime(block.end_time) }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <p v-if="errors.block" class="text-red-600 text-sm mt-1">{{ errors.block }}</p>
+                            </div>
+                            <div v-else-if="form.space_id && selectedDate" class="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">
+                                No hay bloques horarios disponibles para la fecha y cancha seleccionadas.
                             </div>
 
                             <!-- Razón -->
@@ -71,6 +86,7 @@
                                 <button
                                     type="submit"
                                     class="flex-1 bg-tennis-green text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition"
+                                    :disabled="!selectedBlock"
                                 >
                                     Crear Bloqueo
                                 </button>
@@ -87,11 +103,11 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     spaces: Array,
 });
 
@@ -103,13 +119,65 @@ const form = reactive({
 });
 
 const errors = ref({});
+const selectedDate = ref('');
+const availableBlocks = ref([]);
+const selectedBlock = ref(null);
+
+// Watch for changes in space_id or selectedDate to fetch available blocks
+watch([() => form.space_id, selectedDate], () => {
+    if (form.space_id && selectedDate.value) {
+        fetchAvailableBlocks();
+    } else {
+        availableBlocks.value = [];
+        selectedBlock.value = null;
+    }
+});
+
+// Watch for changes in selectedBlock to update form.start_time and form.end_time
+watch(selectedBlock, (newBlock) => {
+    if (newBlock) {
+        form.start_time = newBlock.start_time;
+        form.end_time = newBlock.end_time;
+    } else {
+        form.start_time = '';
+        form.end_time = '';
+    }
+});
+
+const fetchAvailableBlocks = async () => {
+    if (!form.space_id || !selectedDate.value) {
+        availableBlocks.value = [];
+        selectedBlock.value = null;
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/spaces/${form.space_id}/available-time-blocks?date=${selectedDate.value}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch available time blocks');
+        }
+        const data = await response.json();
+        availableBlocks.value = data;
+        selectedBlock.value = null; // Reset selected block when space or date changes
+    } catch (error) {
+        console.error('Error fetching available blocks:', error);
+        availableBlocks.value = [];
+        selectedBlock.value = null;
+    }
+};
+
+const formatTime = (dateTime) => {
+    return new Date(dateTime).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+};
 
 const submitForm = async () => {
-    try {
-        // Convertir datetime-local a formato ISO
-        const startTime = new Date(form.start_time).toISOString().slice(0, 19).replace('T', ' ');
-        const endTime = new Date(form.end_time).toISOString().slice(0, 19).replace('T', ' ');
+    errors.value = {}; // Clear previous errors
+    if (!selectedBlock.value) {
+        errors.value.block = 'Por favor, selecciona un bloque horario.';
+        return;
+    }
 
+    try {
         const response = await fetch('/api/blocked-slots', {
             method: 'POST',
             headers: {
@@ -117,20 +185,26 @@ const submitForm = async () => {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
             },
             body: JSON.stringify({
-                ...form,
-                start_time: startTime,
-                end_time: endTime,
+                space_id: parseInt(form.space_id),
+                start_time: form.start_time,
+                end_time: form.end_time,
+                reason: form.reason,
             }),
         });
 
         if (!response.ok) {
             const data = await response.json();
-            errors.value = data.errors || {};
+            if (response.status === 409) {
+                errors.value.general = data.message; // Conflict message
+            } else {
+                errors.value = data.errors || {};
+            }
         } else {
             window.location.href = '/admin/blocked-slots';
         }
     } catch (error) {
         console.error('Error:', error);
+        errors.value.general = 'Ocurrió un error al procesar el bloqueo.';
     }
 };
 </script>

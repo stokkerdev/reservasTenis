@@ -16,7 +16,7 @@
                                     v-model="form.space_id"
                                     id="space_id"
                                     required
-                                    @change="updateSpaceInfo"
+                                    @change="fetchAvailableBlocks"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 >
                                     <option value="">Seleccionar cancha</option>
@@ -24,7 +24,7 @@
                                         {{ space.name }} - ${{ space.price_per_hour }}/hora
                                     </option>
                                 </select>
-                                <p v-if="form.errors.space_id" class="text-red-600 text-sm mt-1">{{ form.errors.space_id }}</p>
+                                <p v-if="errors.space_id" class="text-red-600 text-sm mt-1">{{ errors.space_id }}</p>
                             </div>
 
                             <!-- Información de la cancha seleccionada -->
@@ -35,30 +35,44 @@
                                 <p class="text-sm text-gray-600"><strong>Descripción:</strong> {{ selectedSpace.description }}</p>
                             </div>
 
-                            <!-- Fecha de inicio -->
+                            <!-- Fecha de la reserva -->
                             <div>
-                                <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">Fecha y Hora de Inicio</label>
+                                <label for="reservation_date" class="block text-sm font-medium text-gray-700 mb-2">Fecha de la Reserva</label>
                                 <input
-                                    v-model="form.start_time"
-                                    type="datetime-local"
-                                    id="start_time"
+                                    v-model="selectedDate"
+                                    type="date"
+                                    id="reservation_date"
                                     required
+                                    @change="fetchAvailableBlocks"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="form.errors.start_time" class="text-red-600 text-sm mt-1">{{ form.errors.start_time }}</p>
+                                <p v-if="errors.date" class="text-red-600 text-sm mt-1">{{ errors.date }}</p>
                             </div>
 
-                            <!-- Fecha de fin -->
-                            <div>
-                                <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">Fecha y Hora de Fin</label>
-                                <input
-                                    v-model="form.end_time"
-                                    type="datetime-local"
-                                    id="end_time"
-                                    required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
-                                />
-                                <p v-if="form.errors.end_time" class="text-red-600 text-sm mt-1">{{ form.errors.end_time }}</p>
+                            <!-- Bloques horarios disponibles -->
+                            <div v-if="availableBlocks.length > 0">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Selecciona un Bloque Horario</label>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <div v-for="block in availableBlocks" :key="block.start_time" class="relative">
+                                        <input
+                                            type="radio"
+                                            :id="`block-${block.start_time}`"
+                                            :value="block"
+                                            v-model="selectedBlock"
+                                            class="hidden peer"
+                                        />
+                                        <label
+                                            :for="`block-${block.start_time}`"
+                                            class="block w-full p-3 border border-gray-300 rounded-lg text-center cursor-pointer peer-checked:bg-tennis-green peer-checked:text-white peer-checked:border-tennis-green hover:bg-gray-50 transition"
+                                        >
+                                            {{ formatTime(block.start_time) }} - {{ formatTime(block.end_time) }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <p v-if="errors.block" class="text-red-600 text-sm mt-1">{{ errors.block }}</p>
+                            </div>
+                            <div v-else-if="form.space_id && selectedDate" class="p-4 text-center text-gray-500 bg-gray-50 rounded-lg">
+                                No hay bloques horarios disponibles para la fecha y cancha seleccionadas.
                             </div>
 
                             <!-- Notas -->
@@ -71,15 +85,15 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                     placeholder="Ej: Necesito raquetas, pelotas, etc."
                                 ></textarea>
-                                <p v-if="form.errors.notes" class="text-red-600 text-sm mt-1">{{ form.errors.notes }}</p>
+                                <p v-if="errors.notes" class="text-red-600 text-sm mt-1">{{ errors.notes }}</p>
                             </div>
 
                             <!-- Resumen -->
-                            <div v-if="selectedSpace && form.start_time && form.end_time" class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <div v-if="selectedSpace && selectedBlock" class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                                 <h4 class="font-semibold text-gray-900 mb-2">Resumen de tu Reserva</h4>
                                 <p class="text-sm text-gray-600 mb-1"><strong>Cancha:</strong> {{ selectedSpace.name }}</p>
-                                <p class="text-sm text-gray-600 mb-1"><strong>Inicio:</strong> {{ formatDateTime(form.start_time) }}</p>
-                                <p class="text-sm text-gray-600 mb-1"><strong>Fin:</strong> {{ formatDateTime(form.end_time) }}</p>
+                                <p class="text-sm text-gray-600 mb-1"><strong>Inicio:</strong> {{ formatDateTime(selectedBlock.start_time) }}</p>
+                                <p class="text-sm text-gray-600 mb-1"><strong>Fin:</strong> {{ formatDateTime(selectedBlock.end_time) }}</p>
                                 <p class="text-sm text-gray-600 mb-2"><strong>Duración:</strong> {{ calculateDuration() }} horas</p>
                                 <p class="text-lg font-semibold text-tennis-green">
                                     Total: ${{ calculateTotal() }}
@@ -91,6 +105,7 @@
                                 <button
                                     type="submit"
                                     class="flex-1 bg-tennis-green text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition"
+                                    :disabled="!selectedBlock"
                                 >
                                     Crear Reserva
                                 </button>
@@ -107,8 +122,7 @@
 </template>
 
 <script setup>
-import { useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -116,51 +130,119 @@ const props = defineProps({
     spaces: Array,
 });
 
-const form = useForm({
+const form = reactive({
     space_id: '',
     start_time: '',
     end_time: '',
     notes: '',
 });
 
+const errors = ref({});
 const selectedSpace = ref(null);
+const selectedDate = ref('');
+const availableBlocks = ref([]);
+const selectedBlock = ref(null);
 
-const updateSpaceInfo = () => {
+// Watch for changes in space_id or selectedDate to fetch available blocks
+watch([() => form.space_id, selectedDate], () => {
+    if (form.space_id && selectedDate.value) {
+        fetchAvailableBlocks();
+    } else {
+        availableBlocks.value = [];
+        selectedBlock.value = null;
+    }
+});
+
+// Watch for changes in selectedBlock to update form.start_time and form.end_time
+watch(selectedBlock, (newBlock) => {
+    if (newBlock) {
+        form.start_time = newBlock.start_time;
+        form.end_time = newBlock.end_time;
+    } else {
+        form.start_time = '';
+        form.end_time = '';
+    }
+});
+
+const fetchAvailableBlocks = async () => {
     selectedSpace.value = props.spaces.find(s => s.id === parseInt(form.space_id)) || null;
+    if (!form.space_id || !selectedDate.value) {
+        availableBlocks.value = [];
+        selectedBlock.value = null;
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/spaces/${form.space_id}/available-time-blocks?date=${selectedDate.value}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch available time blocks');
+        }
+        const data = await response.json();
+        availableBlocks.value = data;
+        selectedBlock.value = null; // Reset selected block when space or date changes
+    } catch (error) {
+        console.error('Error fetching available blocks:', error);
+        availableBlocks.value = [];
+        selectedBlock.value = null;
+    }
 };
 
 const formatDateTime = (dateTime) => {
     return new Date(dateTime).toLocaleString('es-AR');
 };
 
+const formatTime = (dateTime) => {
+    return new Date(dateTime).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+};
+
 const calculateDuration = () => {
-    if (!form.start_time || !form.end_time) return 0;
-    const start = new Date(form.start_time);
-    const end = new Date(form.end_time);
+    if (!selectedBlock.value) return 0;
+    const start = new Date(selectedBlock.value.start_time);
+    const end = new Date(selectedBlock.value.end_time);
     return ((end - start) / (1000 * 60 * 60)).toFixed(1);
 };
 
 const calculateTotal = () => {
-    if (!selectedSpace.value) return 0;
+    if (!selectedSpace.value || !selectedBlock.value) return 0;
     const duration = calculateDuration();
     return (selectedSpace.value.price_per_hour * duration).toFixed(2);
 };
 
-const formatForBackend = (dateTime) => {
-    const d = new Date(dateTime);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const hours = String(d.getHours()).padStart(2, '0');
-    const minutes = String(d.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
+const submitForm = async () => {
+    errors.value = {}; // Clear previous errors
+    if (!selectedBlock.value) {
+        errors.value.block = 'Por favor, selecciona un bloque horario.';
+        return;
+    }
 
-const submitForm = () => {
-    form.transform((data) => ({
-        ...data,
-        start_time: formatForBackend(data.start_time),
-        end_time: formatForBackend(data.end_time),
-    })).post('/reservations');
+    try {
+        const response = await fetch('/api/reservations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+            },
+            body: JSON.stringify({
+                space_id: parseInt(form.space_id),
+                start_time: form.start_time,
+                end_time: form.end_time,
+                notes: form.notes,
+            }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            if (response.status === 409) {
+                errors.value.general = data.message; // Conflict message
+            } else {
+                errors.value = data.errors || {};
+            }
+        } else {
+            window.location.href = '/reservations';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        errors.value.general = 'Ocurrió un error al procesar tu reserva.';
+    }
 };
 </script>

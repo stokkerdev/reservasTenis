@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use App\Models\Space;
 use App\Http\Requests\ReservationRequest;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (API).
      */
     public function index()
     {
@@ -19,67 +21,69 @@ class ReservationController extends Controller
     }
 
     /**
-     * Display the admin reservations page.
+     * Display admin reservations management view.
      */
     public function indexWeb()
     {
-        $reservations = Reservation::with('space')
+        $reservations = Reservation::with('space', 'user')
             ->orderBy('created_at', 'desc')
             ->get();
-
+        
         return Inertia::render('Admin/Reservations/Index', [
             'reservations' => $reservations,
         ]);
     }
 
     /**
-     * Display the current user's reservations page.
+     * Display user reservations view.
      */
     public function userReservationsWeb()
     {
-        $reservations = Reservation::with('space')
-            ->where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
+        $reservations = Reservation::where('user_id', auth()->id())
+            ->with('space')
+            ->orderBy('start_time', 'desc')
             ->get();
-
+        
         return Inertia::render('Reservations/Index', [
             'reservations' => $reservations,
         ]);
     }
 
     /**
-     * Display the create reservation page.
+     * Show create reservation form.
      */
     public function createWeb()
     {
+        $spaces = Space::where('is_active', true)->get();
+        
         return Inertia::render('Reservations/Create', [
-            'spaces' => Space::where('is_active', true)->get(),
+            'spaces' => $spaces,
         ]);
     }
 
-  
-    public function storeWeb(ReservationRequest $request)
+    /**
+     * Store a newly created resource (API).
+     */
+    public function store(ReservationRequest $request)
     {
         $data = $request->validated();
-        $data['user_id'] = $request->user()->id;
-        $data['user_name'] = $request->user()->name;
-        $data['user_email'] = $request->user()->email;
-        $data['status'] = 'confirmed';
-        
+        $data['user_id'] = auth()->id();
+        $data['user_name'] = auth()->user()->name;
+        $data['user_email'] = auth()->user()->email;
+
+        // Check for conflicts
         if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'])) {
-            return back()->withErrors(['start_time' => 'El horario seleccionado ya está reservado o bloqueado.']);
+            return response()->json(['message' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.'], 409);
         }
-        
+
+        $data['status'] = 'confirmada'; // Auto-confirm if no conflicts
+
         $reservation = Reservation::create($data);
-        return redirect()->route('reservations.user.index')->with('success', 'Reserva creada correctamente');
+        return response()->json($reservation->load('space'), 201);
     }
 
     /**
-     * Store a newly created resource (Web/Inertia).
-     */
-
-    /**
-     * Display the specified resource.
+     * Display the specified resource (API).
      */
     public function show(string $id)
     {
@@ -87,21 +91,103 @@ class ReservationController extends Controller
         return response()->json($reservation);
     }
 
-   
+    /**
+     * Update the specified resource (API).
+     */
     public function update(ReservationRequest $request, string $id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update($request->validated());
+
+        $data = $request->validated();
+
+        // Check for conflicts, excluding the current reservation
+        if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'], $reservation->id)) {
+            return response()->json(['message' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.'], 409);
+        }
+
+        $reservation->update($data);
         return response()->json($reservation->load('space'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource (API).
      */
     public function destroy(string $id)
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
-        return response()->json(['message' => 'Reservation deleted successfully']);
+        return response()->json(['message' => 'Reserva eliminada correctamente']);
+    }
+
+    /**
+     * Admin: Accept a reservation.
+     */
+    public function accept($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'confirmada']);
+        
+        // TODO: Enviar correo de confirmación
+        
+        return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Admin: Reject a reservation.
+     */
+    public function reject($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'rechazada']);
+        
+        // TODO: Enviar correo de rechazo
+        
+        return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Shared: Cancel a reservation.
+     */
+    public function cancel($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        
+        if (!in_array($reservation->status, ['pendiente', 'confirmada'])) {
+            return response()->json(['message' => 'No se puede cancelar una reserva en estado ' . $reservation->status], 422);
+        }
+
+        $reservation->update(['status' => 'cancelada']);
+        
+        // TODO: Enviar correo de cancelación
+        
+        return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Get available time blocks for a specific space and date.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Space $space
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAvailableTimeBlocks(Request $request, Space $space)
+    {
+        $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = Carbon::parse($request->input('date'));
+        $intervalMinutes = 60; // Assuming 1-hour blocks
+
+        $allBlocks = $space->generateTimeBlocks($date, $intervalMinutes);
+
+        $availableBlocks = [];
+        foreach ($allBlocks as $block) {
+            if (!Reservation::hasConflict($space->id, $block['start_time'], $block['end_time'])) {
+                $availableBlocks[] = $block;
+            }
+        }
+
+        return response()->json($availableBlocks);
     }
 }

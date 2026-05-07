@@ -24,8 +24,8 @@ class ReservationRequest extends FormRequest
     {
         return [
             'space_id' => 'required|integer|exists:spaces,id',
-            'start_time' => 'required|date_format:Y-m-d H:i',
-            'end_time' => 'required|date_format:Y-m-d H:i|after:start_time',
+            'start_time' => 'required|date_format:Y-m-d H:i:s',
+            'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
             'notes' => 'nullable|string',
         ];
     }
