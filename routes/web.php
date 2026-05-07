@@ -45,5 +45,6 @@ Route::middleware([
     // User routes
     Route::get('/reservations', [ReservationController::class, 'userReservationsWeb'])->name('reservations.user.index');
     Route::get('/reservations/create', [ReservationController::class, 'createWeb'])->name('reservations.create');
+    Route::post('/reservations', [ReservationController::class, 'storeWeb'])->name('reservations.store');
     Route::get('/spaces/{space}', [SpaceController::class, 'showWeb'])->name('spaces.show');
 });

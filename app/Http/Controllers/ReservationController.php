@@ -58,11 +58,25 @@ class ReservationController extends Controller
     }
 
   
-    public function store(ReservationRequest $request)
+    public function storeWeb(ReservationRequest $request)
     {
-        $reservation = Reservation::create($request->validated());
-        return response()->json($reservation->load('space'), 201);
+        $data = $request->validated();
+        $data['user_id'] = $request->user()->id;
+        $data['user_name'] = $request->user()->name;
+        $data['user_email'] = $request->user()->email;
+        $data['status'] = 'pending';
+        
+        if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'])) {
+            return back()->withErrors(['start_time' => 'El horario seleccionado ya está reservado o bloqueado.']);
+        }
+        
+        $reservation = Reservation::create($data);
+        return redirect()->route('reservations.user.index')->with('success', 'Reserva creada correctamente');
     }
+
+    /**
+     * Store a newly created resource (Web/Inertia).
+     */
 
     /**
      * Display the specified resource.

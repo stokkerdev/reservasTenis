@@ -24,7 +24,7 @@
                                         {{ space.name }} - ${{ space.price_per_hour }}/hora
                                     </option>
                                 </select>
-                                <p v-if="errors.space_id" class="text-red-600 text-sm mt-1">{{ errors.space_id }}</p>
+                                <p v-if="form.errors.space_id" class="text-red-600 text-sm mt-1">{{ form.errors.space_id }}</p>
                             </div>
 
                             <!-- Información de la cancha seleccionada -->
@@ -45,7 +45,7 @@
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.start_time" class="text-red-600 text-sm mt-1">{{ errors.start_time }}</p>
+                                <p v-if="form.errors.start_time" class="text-red-600 text-sm mt-1">{{ form.errors.start_time }}</p>
                             </div>
 
                             <!-- Fecha de fin -->
@@ -58,7 +58,7 @@
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.end_time" class="text-red-600 text-sm mt-1">{{ errors.end_time }}</p>
+                                <p v-if="form.errors.end_time" class="text-red-600 text-sm mt-1">{{ form.errors.end_time }}</p>
                             </div>
 
                             <!-- Notas -->
@@ -71,7 +71,7 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                     placeholder="Ej: Necesito raquetas, pelotas, etc."
                                 ></textarea>
-                                <p v-if="errors.notes" class="text-red-600 text-sm mt-1">{{ errors.notes }}</p>
+                                <p v-if="form.errors.notes" class="text-red-600 text-sm mt-1">{{ form.errors.notes }}</p>
                             </div>
 
                             <!-- Resumen -->
@@ -107,7 +107,8 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -115,14 +116,13 @@ const props = defineProps({
     spaces: Array,
 });
 
-const form = reactive({
+const form = useForm({
     space_id: '',
     start_time: '',
     end_time: '',
     notes: '',
 });
 
-const errors = ref({});
 const selectedSpace = ref(null);
 
 const updateSpaceInfo = () => {
@@ -146,33 +146,21 @@ const calculateTotal = () => {
     return (selectedSpace.value.price_per_hour * duration).toFixed(2);
 };
 
-const submitForm = async () => {
-    try {
-        const startTime = new Date(form.start_time).toISOString().slice(0, 19).replace('T', ' ');
-        const endTime = new Date(form.end_time).toISOString().slice(0, 19).replace('T', ' ');
+const formatForBackend = (dateTime) => {
+    const d = new Date(dateTime);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
 
-        const response = await fetch('/api/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-            },
-            body: JSON.stringify({
-                space_id: parseInt(form.space_id),
-                start_time: startTime,
-                end_time: endTime,
-                notes: form.notes,
-            }),
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            errors.value = data.errors || {};
-        } else {
-            window.location.href = '/reservations';
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
+const submitForm = () => {
+    form.transform((data) => ({
+        ...data,
+        start_time: formatForBackend(data.start_time),
+        end_time: formatForBackend(data.end_time),
+    })).post('/reservations');
 };
 </script>

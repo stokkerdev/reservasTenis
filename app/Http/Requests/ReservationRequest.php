@@ -26,9 +26,6 @@ class ReservationRequest extends FormRequest
             'space_id' => 'required|integer|exists:spaces,id',
             'start_time' => 'required|date_format:Y-m-d H:i',
             'end_time' => 'required|date_format:Y-m-d H:i|after:start_time',
-            'status' => 'required|string|in:pending,confirmed,cancelled',
-            'user_name' => 'required|string|max:255',
-            'user_email' => 'required|string|email|max:255',
             'notes' => 'nullable|string',
         ];
     }
