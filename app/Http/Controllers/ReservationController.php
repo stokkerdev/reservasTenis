@@ -15,7 +15,7 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        return Reservation::with('space')->get();
+        return Reservation::with(\'space\')->get();
     }
 
     /**
@@ -23,12 +23,12 @@ class ReservationController extends Controller
      */
     public function indexWeb()
     {
-        $reservations = Reservation::with('space', 'user')
-            ->orderBy('created_at', 'desc')
+        $reservations = Reservation::with(\'space\', \'user\')
+            ->orderBy(\'created_at\', \'desc\')
             ->get();
         
-        return Inertia::render('Admin/Reservations/Index', [
-            'reservations' => $reservations,
+        return Inertia::render(\'Admin/Reservations/Index\', [
+            \'reservations\' => $reservations,
         ]);
     }
 
@@ -37,13 +37,13 @@ class ReservationController extends Controller
      */
     public function userReservationsWeb()
     {
-        $reservations = Reservation::where('user_id', auth()->id())
-            ->with('space')
-            ->orderBy('start_time', 'desc')
+        $reservations = Reservation::where(\'user_id\', auth()->id())
+            ->with(\'space\')
+            ->orderBy(\'start_time\', \'desc\')
             ->get();
         
-        return Inertia::render('Reservations/Index', [
-            'reservations' => $reservations,
+        return Inertia::render(\'Reservations/Index\', [
+            \'reservations\' => $reservations,
         ]);
     }
 
@@ -52,10 +52,10 @@ class ReservationController extends Controller
      */
     public function createWeb()
     {
-        $spaces = Space::where('is_active', true)->get();
+        $spaces = Space::where(\'is_active\', true)->get();
         
-        return Inertia::render('Reservations/Create', [
-            'spaces' => $spaces,
+        return Inertia::render(\'Reservations/Create\', [
+            \'spaces\' => $spaces,
         ]);
     }
 
@@ -65,13 +65,19 @@ class ReservationController extends Controller
     public function store(ReservationRequest $request)
     {
         $data = $request->validated();
-        $data['status'] = 'pendiente';
-        $data['user_id'] = auth()->id();
-        $data['user_name'] = auth()->user()->name;
-        $data['user_email'] = auth()->user()->email;
+        $data[\'user_id\'] = auth()->id();
+        $data[\'user_name\'] = auth()->user()->name;
+        $data[\'user_email\'] = auth()->user()->email;
+
+        // Check for conflicts
+        if (Reservation::hasConflict($data[\'space_id\'], $data[\'start_time\'], $data[\'end_time\'])) {
+            return response()->json([\'message\' => \'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.\'], 409);
+        }
+
+        $data[\'status\'] = \'confirmada\'; // Auto-confirm if no conflicts
 
         $reservation = Reservation::create($data);
-        return response()->json($reservation->load('space'), 201);
+        return response()->json($reservation->load(\'space\'), 201);
     }
 
     /**
@@ -79,7 +85,7 @@ class ReservationController extends Controller
      */
     public function show(string $id)
     {
-        $reservation = Reservation::with('space')->findOrFail($id);
+        $reservation = Reservation::with(\'space\')->findOrFail($id);
         return response()->json($reservation);
     }
 
@@ -89,8 +95,16 @@ class ReservationController extends Controller
     public function update(ReservationRequest $request, string $id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update($request->validated());
-        return response()->json($reservation->load('space'));
+
+        $data = $request->validated();
+
+        // Check for conflicts, excluding the current reservation
+        if (Reservation::hasConflict($data[\'space_id\'], $data[\'start_time\'], $data[\'end_time\'], $reservation->id)) {
+            return response()->json([\'message\' => \'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.\'], 409);
+        }
+
+        $reservation->update($data);
+        return response()->json($reservation->load(\'space\'));
     }
 
     /**
@@ -100,7 +114,7 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
-        return response()->json(['message' => 'Reserva eliminada correctamente']);
+        return response()->json([\'message\' => \'Reserva eliminada correctamente\']);
     }
 
     /**
@@ -109,11 +123,11 @@ class ReservationController extends Controller
     public function accept($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'confirmada']);
+        $reservation->update([\'status\' => \'confirmada\']);
         
         // TODO: Enviar correo de confirmación
         
-        return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
+        return response()->json([\'message\' => \'Reserva confirmada\', \'reservation\' => $reservation]);
     }
 
     /**
@@ -122,11 +136,11 @@ class ReservationController extends Controller
     public function reject($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'rechazada']);
+        $reservation->update([\'status\' => \'rechazada\']);
         
         // TODO: Enviar correo de rechazo
         
-        return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
+        return response()->json([\'message\' => \'Reserva rechazada\', \'reservation\' => $reservation]);
     }
 
     /**
@@ -136,14 +150,14 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         
-        if (!in_array($reservation->status, ['pendiente', 'confirmada'])) {
-            return response()->json(['message' => 'No se puede cancelar una reserva en estado ' . $reservation->status], 422);
+        if (!in_array($reservation->status, [\'pendiente\', \'confirmada\'])) {
+            return response()->json([\'message\' => \'No se puede cancelar una reserva en estado \' . $reservation->status], 422);
         }
 
-        $reservation->update(['status' => 'cancelada']);
+        $reservation->update([\'status\' => \'cancelada\']);
         
         // TODO: Enviar correo de cancelación
         
-        return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
+        return response()->json([\'message\' => \'Reserva cancelada\', \'reservation\' => $reservation]);
     }
 }
