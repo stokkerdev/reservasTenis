@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Reservation;
 use App\Http\Requests\ReservationRequest;
+use Illuminate\Http\Request;
 
 class ReservationController extends Controller
 {
@@ -16,19 +17,13 @@ class ReservationController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(ReservationRequest $request)
     {
-        $reservation = Reservation::create($request->validated());
+        $data = $request->validated();
+        $data['status'] = 'pendiente'; // Estado inicial según documento
+        $reservation = Reservation::create($data);
         return response()->json($reservation->load('space'), 201);
     }
 
@@ -36,15 +31,6 @@ class ReservationController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        $reservation = Reservation::with('space')->findOrFail($id);
-        return response()->json($reservation);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
     {
         $reservation = Reservation::with('space')->findOrFail($id);
         return response()->json($reservation);
@@ -67,6 +53,51 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
-        return response()->json(['message' => 'Reservation deleted successfully']);
+        return response()->json(['message' => 'Reserva eliminada correctamente']);
+    }
+
+    /**
+     * Admin: Accept a reservation.
+     */
+    public function accept($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'confirmada']);
+        
+        // Aquí iría el envío de correo según el documento
+        
+        return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Admin: Reject a reservation.
+     */
+    public function reject($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'rechazada']);
+        
+        // Aquí iría el envío de correo según el documento
+        
+        return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Shared: Cancel a reservation.
+     */
+    public function cancel($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        
+        // Solo permitir cancelar si está pendiente o confirmada
+        if (!in_array($reservation->status, ['pendiente', 'confirmada'])) {
+            return response()->json(['message' => 'No se puede cancelar una reserva en estado ' . $reservation->status], 422);
+        }
+
+        $reservation->update(['status' => 'cancelada']);
+        
+        // Aquí iría el envío de correo según el documento
+        
+        return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
     }
 }
