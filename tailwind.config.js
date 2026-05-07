@@ -17,6 +17,12 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'tennis-green': '#2e5a27', // Verde Wimbledon
+                'tennis-cyan': '#a5f3fc', // Cyan cielo claro
+                'tennis-white': '#ffffff',
+                'tennis-yellow': '#ccff00', // Color pelota de tenis
+            },
         },
     },
 

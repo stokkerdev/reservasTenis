@@ -24,16 +24,21 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Registro" />
 
     <AuthenticationCard>
         <template #logo>
             <AuthenticationCardLogo />
         </template>
 
+        <div class="mb-8 text-center">
+            <h2 class="text-2xl font-bold text-tennis-green">Únete al Club</h2>
+            <p class="text-gray-500 text-sm mt-1">Regístrate para comenzar a reservar tus canchas.</p>
+        </div>
+
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="Nombre Completo" />
                 <TextInput
                     id="name"
                     v-model="form.name"
@@ -42,12 +47,13 @@ const submit = () => {
                     required
                     autofocus
                     autocomplete="name"
+                    placeholder="Tu nombre"
                 />
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="Correo Electrónico" />
                 <TextInput
                     id="email"
                     v-model="form.email"
@@ -55,12 +61,13 @@ const submit = () => {
                     class="mt-1 block w-full"
                     required
                     autocomplete="username"
+                    placeholder="ejemplo@tenis.com"
                 />
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" value="Contraseña" />
                 <TextInput
                     id="password"
                     v-model="form.password"
@@ -68,12 +75,13 @@ const submit = () => {
                     class="mt-1 block w-full"
                     required
                     autocomplete="new-password"
+                    placeholder="••••••••"
                 />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
+                <InputLabel for="password_confirmation" value="Confirmar Contraseña" />
                 <TextInput
                     id="password_confirmation"
                     v-model="form.password_confirmation"
@@ -81,6 +89,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     required
                     autocomplete="new-password"
+                    placeholder="••••••••"
                 />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
@@ -90,22 +99,24 @@ const submit = () => {
                     <div class="flex items-center">
                         <Checkbox id="terms" v-model:checked="form.terms" name="terms" required />
 
-                        <div class="ms-2">
-                            I agree to the <a target="_blank" :href="route('terms.show')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Terms of Service</a> and <a target="_blank" :href="route('policy.show')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Privacy Policy</a>
+                        <div class="ms-2 text-sm text-gray-600">
+                            Acepto los <a target="_blank" :href="route('terms.show')" class="underline hover:text-tennis-green">Términos de Servicio</a> y la <a target="_blank" :href="route('policy.show')" class="underline hover:text-tennis-green">Política de Privacidad</a>
                         </div>
                     </div>
                     <InputError class="mt-2" :message="form.errors.terms" />
                 </InputLabel>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Already registered?
-                </Link>
-
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
+            <div class="mt-6">
+                <PrimaryButton class="w-full justify-center py-3 text-base" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Registrarme
                 </PrimaryButton>
+            </div>
+
+            <div class="flex items-center justify-center mt-6">
+                <Link :href="route('login')" class="text-sm text-gray-600 hover:text-tennis-green font-semibold">
+                    ¿Ya tienes una cuenta? Inicia sesión
+                </Link>
             </div>
         </form>
     </AuthenticationCard>

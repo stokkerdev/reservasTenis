@@ -3,101 +3,80 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 </script>
 
 <template>
-    <div>
+    <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
         <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-            <ApplicationLogo class="block h-12 w-auto" />
-
-            <h1 class="mt-8 text-2xl font-medium text-gray-900">
-                Welcome to your Jetstream application!
-            </h1>
-
-            <p class="mt-6 text-gray-500 leading-relaxed">
-                Laravel Jetstream provides a beautiful, robust starting point for your next Laravel application. Laravel is designed
-                to help you build your application using a development environment that is simple, powerful, and enjoyable. We believe
-                you should love expressing your creativity through programming, so we have spent time carefully crafting the Laravel
-                ecosystem to be a breath of fresh air. We hope you love it.
-            </p>
+            <div class="flex items-center space-x-4">
+                <ApplicationLogo class="block h-16 w-auto" />
+                <div>
+                    <h1 class="text-3xl font-bold text-tennis-green">
+                        Club de Tenis - Panel de Control
+                    </h1>
+                    <p class="text-gray-500">Bienvenido al Deporte Blanco. Gestiona tus reservas y entrenamientos.</p>
+                </div>
+            </div>
         </div>
 
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="size-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://laravel.com/docs">Documentation</a>
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laravel has wonderful documentation covering every aspect of the framework. Whether you're new to the framework or have previous experience, we recommend reading all of the documentation from beginning to end.
-                </p>
-
-                <p class="mt-4 text-sm">
-                    <a href="https://laravel.com/docs" class="inline-flex items-center font-semibold text-indigo-700">
-                        Explore the documentation
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="ms-1 size-5 fill-indigo-500">
-                            <path fill-rule="evenodd" d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z" clip-rule="evenodd" />
+        <div class="bg-gray-50 bg-opacity-50 grid grid-cols-1 md:grid-cols-3 gap-6 p-6 lg:p-8">
+            <!-- Card de Reservas -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-tennis-green hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-tennis-green/10 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-tennis-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                    </a>
-                </p>
+                    </div>
+                    <h2 class="ms-3 text-xl font-bold text-gray-800">Mis Reservas</h2>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Consulta tus próximas partidas y el estado de tus canchas reservadas.</p>
+                <a href="#" class="inline-flex items-center text-tennis-green font-semibold hover:underline">
+                    Ver calendario →
+                </a>
             </div>
 
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="size-6 stroke-gray-400">
-                        <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://laracasts.com">Laracasts</a>
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
-                </p>
-
-                <p class="mt-4 text-sm">
-                    <a href="https://laracasts.com" class="inline-flex items-center font-semibold text-indigo-700">
-                        Start watching Laracasts
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="ms-1 size-5 fill-indigo-500">
-                            <path fill-rule="evenodd" d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z" clip-rule="evenodd" />
+            <!-- Card de Canchas -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-tennis-cyan hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-tennis-cyan/20 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
-                    </a>
-                </p>
+                    </div>
+                    <h2 class="ms-3 text-xl font-bold text-gray-800">Canchas Disponibles</h2>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Explora las canchas de césped, arcilla y cemento listas para jugar.</p>
+                <a href="#" class="inline-flex items-center text-blue-600 font-semibold hover:underline">
+                    Reservar ahora →
+                </a>
             </div>
 
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="size-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://tailwindcss.com/">Tailwind</a>
-                    </h2>
+            <!-- Card de Perfil -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-tennis-yellow hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-tennis-yellow/20 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-tennis-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <h2 class="ms-3 text-xl font-bold text-gray-800">Mi Nivel</h2>
                 </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laravel Jetstream is built with Tailwind, an amazing utility first CSS framework that doesn't get in your way. You'll be amazed how easily you can build and maintain fresh, modern designs with this wonderful framework at your fingertips.
-                </p>
+                <p class="text-gray-600 text-sm mb-4">Sigue tus estadísticas de juego y mejora tu ranking en el club.</p>
+                <a href="#" class="inline-flex items-center text-tennis-green font-semibold hover:underline">
+                    Ver estadísticas →
+                </a>
             </div>
+        </div>
 
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="size-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        Authentication
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Authentication and registration views are included with Laravel Jetstream, as well as support for user email verification and resetting forgotten passwords. So, you're free to get started with what matters most: building your application.
-                </p>
+        <!-- Banner Decorativo -->
+        <div class="relative bg-tennis-green h-48 flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 opacity-20">
+                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <line x1="0" y1="50" x2="100" y2="50" stroke="white" stroke-width="0.5" />
+                    <line x1="50" y1="0" x2="50" y2="100" stroke="white" stroke-width="0.5" />
+                </svg>
+            </div>
+            <div class="z-10 text-center">
+                <h3 class="text-white text-2xl font-bold italic italic">"El tenis es un deporte mental. Ganas o pierdes el partido antes de salir a la cancha."</h3>
+                <p class="text-tennis-cyan mt-2">- Venus Williams</p>
             </div>
         </div>
     </div>
