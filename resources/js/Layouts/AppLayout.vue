@@ -44,6 +44,26 @@ const logout = () => {
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')" class="text-white hover:text-tennis-cyan transition-colors">
                                     Dashboard
                                 </NavLink>
+
+                                <!-- Admin Links -->
+                                <template v-if="$page.props.auth.user.role === 'admin'">
+                                    <NavLink :href="route('spaces.index')" :active="route().current('spaces.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                        Canchas
+                                    </NavLink>
+                                    <NavLink :href="route('blocked-slots.index')" :active="route().current('blocked-slots.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                        Bloqueos
+                                    </NavLink>
+                                    <NavLink :href="route('reservations.admin.index')" :active="route().current('reservations.admin.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                        Reservas
+                                    </NavLink>
+                                </template>
+
+                                <!-- User Links -->
+                                <template v-else>
+                                    <NavLink :href="route('reservations.user.index')" :active="route().current('reservations.user.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                        Mis Reservas
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 
@@ -108,6 +128,24 @@ const logout = () => {
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')" class="text-white">
                             Dashboard
                         </ResponsiveNavLink>
+
+                        <template v-if="$page.props.auth.user.role === 'admin'">
+                            <ResponsiveNavLink :href="route('spaces.index')" :active="route().current('spaces.index')" class="text-white">
+                                Canchas
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('blocked-slots.index')" :active="route().current('blocked-slots.index')" class="text-white">
+                                Bloqueos
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('reservations.admin.index')" :active="route().current('reservations.admin.index')" class="text-white">
+                                Reservas
+                            </ResponsiveNavLink>
+                        </template>
+
+                        <template v-else>
+                            <ResponsiveNavLink :href="route('reservations.user.index')" :active="route().current('reservations.user.index')" class="text-white">
+                                Mis Reservas
+                            </ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->

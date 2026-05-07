@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\Space;
 use App\Http\Requests\ReservationRequest;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ReservationController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (API).
      */
     public function index()
     {
@@ -17,18 +19,63 @@ class ReservationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display admin reservations management view.
+     */
+    public function indexWeb()
+    {
+        $reservations = Reservation::with('space', 'user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return Inertia::render('Admin/Reservations/Index', [
+            'reservations' => $reservations,
+        ]);
+    }
+
+    /**
+     * Display user reservations view.
+     */
+    public function userReservationsWeb()
+    {
+        $reservations = Reservation::where('user_id', auth()->id())
+            ->with('space')
+            ->orderBy('start_time', 'desc')
+            ->get();
+        
+        return Inertia::render('Reservations/Index', [
+            'reservations' => $reservations,
+        ]);
+    }
+
+    /**
+     * Show create reservation form.
+     */
+    public function createWeb()
+    {
+        $spaces = Space::where('is_active', true)->get();
+        
+        return Inertia::render('Reservations/Create', [
+            'spaces' => $spaces,
+        ]);
+    }
+
+    /**
+     * Store a newly created resource (API).
      */
     public function store(ReservationRequest $request)
     {
         $data = $request->validated();
-        $data['status'] = 'pendiente'; // Estado inicial según documento
+        $data['status'] = 'pendiente';
+        $data['user_id'] = auth()->id();
+        $data['user_name'] = auth()->user()->name;
+        $data['user_email'] = auth()->user()->email;
+
         $reservation = Reservation::create($data);
         return response()->json($reservation->load('space'), 201);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (API).
      */
     public function show(string $id)
     {
@@ -37,7 +84,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource (API).
      */
     public function update(ReservationRequest $request, string $id)
     {
@@ -47,7 +94,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource (API).
      */
     public function destroy(string $id)
     {
@@ -64,7 +111,7 @@ class ReservationController extends Controller
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'confirmada']);
         
-        // Aquí iría el envío de correo según el documento
+        // TODO: Enviar correo de confirmación
         
         return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
     }
@@ -77,7 +124,7 @@ class ReservationController extends Controller
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'rechazada']);
         
-        // Aquí iría el envío de correo según el documento
+        // TODO: Enviar correo de rechazo
         
         return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
     }
@@ -89,14 +136,13 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         
-        // Solo permitir cancelar si está pendiente o confirmada
         if (!in_array($reservation->status, ['pendiente', 'confirmada'])) {
             return response()->json(['message' => 'No se puede cancelar una reserva en estado ' . $reservation->status], 422);
         }
 
         $reservation->update(['status' => 'cancelada']);
         
-        // Aquí iría el envío de correo según el documento
+        // TODO: Enviar correo de cancelación
         
         return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
     }
