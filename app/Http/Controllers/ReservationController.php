@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\Space;
 use App\Http\Requests\ReservationRequest;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ReservationController extends Controller
 {
@@ -13,6 +16,45 @@ class ReservationController extends Controller
     public function index()
     {
         return Reservation::with('space')->get();
+    }
+
+    /**
+     * Display the admin reservations page.
+     */
+    public function indexWeb()
+    {
+        $reservations = Reservation::with('space')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('Admin/Reservations/Index', [
+            'reservations' => $reservations,
+        ]);
+    }
+
+    /**
+     * Display the current user's reservations page.
+     */
+    public function userReservationsWeb()
+    {
+        $reservations = Reservation::with('space')
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('Reservations/Index', [
+            'reservations' => $reservations,
+        ]);
+    }
+
+    /**
+     * Display the create reservation page.
+     */
+    public function createWeb()
+    {
+        return Inertia::render('Reservations/Create', [
+            'spaces' => Space::where('is_active', true)->get(),
+        ]);
     }
 
   
