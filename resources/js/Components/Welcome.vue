@@ -1,5 +1,6 @@
 <script setup>
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -28,9 +29,9 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
                     <h2 class="ms-3 text-xl font-bold text-gray-800">Mis Reservas</h2>
                 </div>
                 <p class="text-gray-600 text-sm mb-4">Consulta tus próximas partidas y el estado de tus canchas reservadas.</p>
-                <a href="#" class="inline-flex items-center text-tennis-green font-semibold hover:underline">
+                <Link :href="route('reservations.user.index')" class="inline-flex items-center text-tennis-green font-semibold hover:underline">
                     Ver calendario →
-                </a>
+                </Link>
             </div>
 
             <!-- Card de Canchas / Gestión -->
@@ -48,9 +49,12 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
                 <p class="text-gray-600 text-sm mb-4">
                     {{ $page.props.auth.user.role === 'admin' ? 'Administra las canchas, bloquea horarios y configura disponibilidad.' : 'Explora las canchas de césped, arcilla y cemento listas para jugar.' }}
                 </p>
-                <a href="#" class="inline-flex items-center text-blue-600 font-semibold hover:underline">
+                <Link 
+                    :href="$page.props.auth.user.role === 'admin' ? route('spaces.index') : route('reservations.create')"
+                    class="inline-flex items-center text-blue-600 font-semibold hover:underline"
+                >
                     {{ $page.props.auth.user.role === 'admin' ? 'Configurar espacios →' : 'Reservar ahora →' }}
-                </a>
+                </Link>
             </div>
 
             <!-- Card de Perfil -->
