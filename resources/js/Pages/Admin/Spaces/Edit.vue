@@ -19,7 +19,7 @@
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</p>
+                                <p v-if="form.errors.name" class="text-red-600 text-sm mt-1">{{ form.errors.name }}</p>
                             </div>
 
                             <!-- Slug -->
@@ -32,7 +32,7 @@
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.slug" class="text-red-600 text-sm mt-1">{{ errors.slug }}</p>
+                                <p v-if="form.errors.slug" class="text-red-600 text-sm mt-1">{{ form.errors.slug }}</p>
                             </div>
 
                             <!-- Tipo -->
@@ -49,7 +49,7 @@
                                     <option value="cemento">Cemento</option>
                                     <option value="indoor">Indoor</option>
                                 </select>
-                                <p v-if="errors.type" class="text-red-600 text-sm mt-1">{{ errors.type }}</p>
+                                <p v-if="form.errors.type" class="text-red-600 text-sm mt-1">{{ form.errors.type }}</p>
                             </div>
 
                             <!-- Capacidad -->
@@ -62,7 +62,7 @@
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.capacity" class="text-red-600 text-sm mt-1">{{ errors.capacity }}</p>
+                                <p v-if="form.errors.capacity" class="text-red-600 text-sm mt-1">{{ form.errors.capacity }}</p>
                             </div>
 
                             <!-- Descripción -->
@@ -74,7 +74,7 @@
                                     rows="4"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 ></textarea>
-                                <p v-if="errors.description" class="text-red-600 text-sm mt-1">{{ errors.description }}</p>
+                                <p v-if="form.errors.description" class="text-red-600 text-sm mt-1">{{ form.errors.description }}</p>
                             </div>
 
                             <!-- Precio por hora -->
@@ -88,7 +88,7 @@
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 />
-                                <p v-if="errors.price_per_hour" class="text-red-600 text-sm mt-1">{{ errors.price_per_hour }}</p>
+                                <p v-if="form.errors.price_per_hour" class="text-red-600 text-sm mt-1">{{ form.errors.price_per_hour }}</p>
                             </div>
 
                             <!-- Activa -->
@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
 
@@ -131,41 +131,17 @@ const props = defineProps({
     space: Object,
 });
 
-const form = reactive({
-    name: '',
-    slug: '',
-    type: '',
-    capacity: 4,
-    description: '',
-    price_per_hour: 0,
-    is_active: true,
+const form = useForm({
+    name: props.space.name,
+    slug: props.space.slug,
+    type: props.space.type,
+    capacity: props.space.capacity,
+    description: props.space.description,
+    price_per_hour: props.space.price_per_hour,
+    is_active: props.space.is_active,
 });
 
-const errors = ref({});
-
-onMounted(() => {
-    Object.assign(form, props.space);
-});
-
-const submitForm = async () => {
-    try {
-        const response = await fetch(`/api/spaces/${props.space.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-            },
-            body: JSON.stringify(form),
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            errors.value = data.errors || {};
-        } else {
-            window.location.href = '/admin/spaces';
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
+const submitForm = () => {
+    form.put(`/admin/spaces/${props.space.id}`);
 };
 </script>

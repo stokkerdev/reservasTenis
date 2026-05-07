@@ -83,7 +83,25 @@ class SpaceController extends Controller
     }
 
     /**
-     * Remove the specified resource (API).
+     * Store a newly created resource (Web/Inertia).
+     */
+    public function storeWeb(SpaceRequest $request)
+    {
+        $space = Space::create($request->validated());
+        return redirect()->route('spaces.index')->with('success', 'Cancha creada correctamente');
+    }
+
+    /**
+     * Update the specified resource (Web/Inertia).
+     */
+    public function updateWeb(SpaceRequest $request, Space $space)
+    {
+        $space->update($request->validated());
+        return redirect()->route('spaces.index')->with('success', 'Cancha actualizada correctamente');
+    }
+
+    /**
+     * Remove the specified resource from storage.
      */
     public function destroy(Space $space)
     {

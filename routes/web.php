@@ -30,7 +30,9 @@ Route::middleware([
         // Spaces management
         Route::get('/admin/spaces', [SpaceController::class, 'indexWeb'])->name('spaces.index');
         Route::get('/admin/spaces/create', [SpaceController::class, 'createWeb'])->name('spaces.create');
+        Route::post('/admin/spaces', [SpaceController::class, 'storeWeb'])->name('spaces.store');
         Route::get('/admin/spaces/{space}/edit', [SpaceController::class, 'editWeb'])->name('spaces.edit');
+        Route::put('/admin/spaces/{space}', [SpaceController::class, 'updateWeb'])->name('spaces.update');
 
         // BlockedSlots management
         Route::get('/admin/blocked-slots', [BlockedSlotController::class, 'indexWeb'])->name('blocked-slots.index');
