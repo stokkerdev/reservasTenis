@@ -15,9 +15,9 @@ class BlockedSlotController extends Controller
      */
     public function indexWeb()
     {
-        $blockedSlots = BlockedSlot::with(\'space\')->get();
-        return Inertia::render(\'Admin/BlockedSlots/Index\', [
-            \'blockedSlots\' => $blockedSlots,
+        $blockedSlots = BlockedSlot::with('space')->get();
+        return Inertia::render('Admin/BlockedSlots/Index', [
+            'blockedSlots' => $blockedSlots,
         ]);
     }
 
@@ -27,8 +27,8 @@ class BlockedSlotController extends Controller
     public function createWeb()
     {
         $spaces = Space::all();
-        return Inertia::render(\'Admin/BlockedSlots/Create\', [
-            \'spaces\' => $spaces,
+        return Inertia::render('Admin/BlockedSlots/Create', [
+            'spaces' => $spaces,
         ]);
     }
 
@@ -38,20 +38,19 @@ class BlockedSlotController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            \'space_id\' => \'required|exists:spaces,id\',
-            \'start_time\' => \'required|date_format:Y-m-d H:i:s\',
-            \'end_time\' => \'required|date_format:Y-m-d H:i:s|after:start_time\',
-            \'reason\' => \'required|string|max:255\',
+            'space_id' => 'required|exists:spaces,id',
+            'start_time' => 'required|date_format:Y-m-d H:i:s',
+            'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
+            'reason' => 'required|string|max:255',
         ]);
 
         // Check for conflicts with existing reservations or other blocked slots
-        if (Reservation::hasConflict($validated[\'space_id\'], $validated[\'start_time\'], $validated[\'end_time\
-'])) {
-            return response()->json([\'message\' => \'Conflicto de horario. Ya existe una reserva o bloqueo en ese período.\'], 409);
+        if (Reservation::hasConflict($validated['space_id'], $validated['start_time'], $validated['end_time'])) {
+            return response()->json(['message' => 'Conflicto de horario. Ya existe una reserva o bloqueo en ese período.'], 409);
         }
 
         $blockedSlot = BlockedSlot::create($validated);
-        return response()->json($blockedSlot->load(\'space\'), 201);
+        return response()->json($blockedSlot->load('space'), 201);
     }
 
     /**
@@ -60,6 +59,6 @@ class BlockedSlotController extends Controller
     public function destroy(BlockedSlot $blockedSlot)
     {
         $blockedSlot->delete();
-        return response()->json([\'message\' => \'Bloqueo eliminado correctamente\']);
+        return response()->json(['message' => 'Bloqueo eliminado correctamente']);
     }
 }
