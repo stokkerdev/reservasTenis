@@ -56,6 +56,9 @@ const logout = () => {
                                     <NavLink :href="route('reservations.admin.index')" :active="route().current('reservations.admin.index')" class="text-white hover:text-tennis-cyan transition-colors">
                                         Reservas
                                     </NavLink>
+                                    <NavLink :href="route('availabilities.index')" :active="route().current('availabilities.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                        Disponibilidad
+                                    </NavLink>
                                 </template>
 
                                 <!-- User Links -->
@@ -138,6 +141,9 @@ const logout = () => {
                             </ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('reservations.admin.index')" :active="route().current('reservations.admin.index')" class="text-white">
                                 Reservas
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('availabilities.index')" :active="route().current('availabilities.index')" class="text-white">
+                                Disponibilidad
                             </ResponsiveNavLink>
                         </template>
 

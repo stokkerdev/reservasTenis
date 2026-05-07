@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\BlockedSlotController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\AvailabilityController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -33,13 +34,24 @@ Route::middleware([
         Route::post('/admin/spaces', [SpaceController::class, 'storeWeb'])->name('spaces.store');
         Route::get('/admin/spaces/{space}/edit', [SpaceController::class, 'editWeb'])->name('spaces.edit');
         Route::put('/admin/spaces/{space}', [SpaceController::class, 'updateWeb'])->name('spaces.update');
+        Route::delete('/admin/spaces/{space}', [SpaceController::class, 'destroyWeb'])->name('spaces.destroy');
 
         // BlockedSlots management
         Route::get('/admin/blocked-slots', [BlockedSlotController::class, 'indexWeb'])->name('blocked-slots.index');
         Route::get('/admin/blocked-slots/create', [BlockedSlotController::class, 'createWeb'])->name('blocked-slots.create');
+        Route::post('/admin/blocked-slots', [BlockedSlotController::class, 'storeWeb'])->name('blocked-slots.store');
+        Route::delete('/admin/blocked-slots/{blockedSlot}', [BlockedSlotController::class, 'destroyWeb'])->name('blocked-slots.destroy');
 
         // Reservations management
         Route::get('/admin/reservations', [ReservationController::class, 'indexWeb'])->name('reservations.admin.index');
+
+        // Availabilities management
+        Route::get('/admin/availabilities', [AvailabilityController::class, 'indexWeb'])->name('availabilities.index');
+        Route::get('/admin/availabilities/create', [AvailabilityController::class, 'createWeb'])->name('availabilities.create');
+        Route::post('/admin/availabilities', [AvailabilityController::class, 'storeWeb'])->name('availabilities.store');
+        Route::get('/admin/availabilities/{availability}/edit', [AvailabilityController::class, 'editWeb'])->name('availabilities.edit');
+        Route::put('/admin/availabilities/{availability}', [AvailabilityController::class, 'updateWeb'])->name('availabilities.update');
+        Route::delete('/admin/availabilities/{availability}', [AvailabilityController::class, 'destroyWeb'])->name('availabilities.destroy');
     });
 
     // User routes
