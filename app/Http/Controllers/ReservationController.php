@@ -64,7 +64,7 @@ class ReservationController extends Controller
         $data['user_id'] = $request->user()->id;
         $data['user_name'] = $request->user()->name;
         $data['user_email'] = $request->user()->email;
-        $data['status'] = 'pending';
+        $data['status'] = 'confirmed';
         
         if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'])) {
             return back()->withErrors(['start_time' => 'El horario seleccionado ya está reservado o bloqueado.']);
