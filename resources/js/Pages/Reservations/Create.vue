@@ -165,27 +165,33 @@ watch(selectedBlock, (newBlock) => {
 });
 
 const fetchAvailableBlocks = async () => {
-    selectedSpace.value = props.spaces.find(s => s.id === parseInt(form.space_id)) || null;
-    if (!form.space_id || !selectedDate.value) {
-        availableBlocks.value = [];
-        selectedBlock.value = null;
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/spaces/${form.space_id}/available-time-blocks?date=${selectedDate.value}`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch available time blocks');
+        selectedSpace.value = props.spaces.find(s => s.id === parseInt(form.space_id)) || null;
+        if (!form.space_id || !selectedDate.value) {
+            availableBlocks.value = [];
+            selectedBlock.value = null;
+            return;
         }
-        const data = await response.json();
-        availableBlocks.value = data;
-        selectedBlock.value = null; // Reset selected block when space or date changes
-    } catch (error) {
-        console.error('Error fetching available blocks:', error);
-        availableBlocks.value = [];
-        selectedBlock.value = null;
-    }
-};
+
+        try {
+            const response = await fetch(`/spaces/${form.space_id}/available-time-blocks?date=${selectedDate.value}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch available time blocks');
+            }
+            const data = await response.json();
+            availableBlocks.value = data;
+            selectedBlock.value = null;
+        } catch (error) {
+            console.error('Error fetching available blocks:', error);
+            availableBlocks.value = [];
+            selectedBlock.value = null;
+        }
+    };
 
 const formatDateTime = (dateTime) => {
     return new Date(dateTime).toLocaleString('es-AR');
@@ -209,40 +215,44 @@ const calculateTotal = () => {
 };
 
 const submitForm = async () => {
-    errors.value = {}; // Clear previous errors
-    if (!selectedBlock.value) {
-        errors.value.block = 'Por favor, selecciona un bloque horario.';
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-            },
-            body: JSON.stringify({
-                space_id: parseInt(form.space_id),
-                start_time: form.start_time,
-                end_time: form.end_time,
-                notes: form.notes,
-            }),
-        });
-
-        if (!response.ok) {
-            const data = await response.json();
-            if (response.status === 409) {
-                errors.value.general = data.message; // Conflict message
-            } else {
-                errors.value = data.errors || {};
-            }
-        } else {
-            window.location.href = '/reservations';
+        errors.value = {};
+        if (!selectedBlock.value) {
+            errors.value.block = 'Por favor, selecciona un bloque horario.';
+            return;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        errors.value.general = 'Ocurrió un error al procesar tu reserva.';
-    }
-};
+
+        try {
+            const response = await fetch(route('reservations.store'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    space_id: parseInt(form.space_id),
+                    start_time: form.start_time,
+                    end_time: form.end_time,
+                    notes: form.notes,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 409) {
+                    errors.value.general = data.errors?.general || data.message;
+                } else {
+                    errors.value = data.errors || {};
+                }
+            } else {
+                window.location.href = route('reservations.user.index');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            errors.value.general = 'Ocurrió un error al procesar tu reserva.';
+        }
+    };
 </script>

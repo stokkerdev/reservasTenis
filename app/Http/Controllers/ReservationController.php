@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class ReservationController extends Controller
 {
@@ -59,6 +60,26 @@ class ReservationController extends Controller
         return Inertia::render('Reservations/Create', [
             'spaces' => $spaces,
         ]);
+    }
+
+    /**
+     * Store a newly created resource (Web/Inertia).
+     */
+    public function storeWeb(ReservationRequest $request)
+    {
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
+        $data['user_name'] = auth()->user()->name;
+        $data['user_email'] = auth()->user()->email;
+
+        if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'])) {
+            return response()->json(['errors' => ['general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.']], 409);
+        }
+
+        $data['status'] = 'confirmada';
+        $reservation = Reservation::create($data);
+        
+        return response()->json(['message' => 'Reserva creada correctamente.', 'reservation' => $reservation->load('space')], 201);
     }
 
     /**
@@ -161,6 +182,30 @@ class ReservationController extends Controller
         // TODO: Enviar correo de cancelación
         
         return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Get available time blocks for a specific space and date (Web/Inertia).
+     */
+    public function getAvailableTimeBlocksWeb(Request $request, Space $space)
+    {
+        $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = Carbon::parse($request->input('date'));
+        $intervalMinutes = 60;
+
+        $allBlocks = $space->generateTimeBlocks($date, $intervalMinutes);
+
+        $availableBlocks = [];
+        foreach ($allBlocks as $block) {
+            if (!Reservation::hasConflict($space->id, $block['start_time'], $block['end_time'])) {
+                $availableBlocks[] = $block;
+            }
+        }
+
+        return response()->json($availableBlocks);
     }
 
     /**

@@ -88,7 +88,7 @@ class SpaceController extends Controller
     public function storeWeb(SpaceRequest $request)
     {
         $space = Space::create($request->validated());
-        return redirect()->route('spaces.index')->with('success', 'Cancha creada correctamente');
+        return redirect()->route('admin.spaces.index')->with('success', 'Cancha creada correctamente');
     }
 
     /**
@@ -97,7 +97,7 @@ class SpaceController extends Controller
     public function updateWeb(SpaceRequest $request, Space $space)
     {
         $space->update($request->validated());
-        return redirect()->route('spaces.index')->with('success', 'Cancha actualizada correctamente');
+        return redirect()->route('admin.spaces.index')->with('success', 'Cancha actualizada correctamente');
     }
 
     /**
@@ -109,5 +109,14 @@ class SpaceController extends Controller
         return response()->json([
             'message' => 'Cancha eliminada correctamente'
         ]);
+    }
+
+    /**
+     * Remove the specified resource from storage (Web/Inertia).
+     */
+    public function destroyWeb(Space $space)
+    {
+        $space->delete();
+        return redirect()->route('admin.spaces.index')->with('success', 'Cancha eliminada correctamente');
     }
 }

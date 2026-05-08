@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->dateTime('start_time');
             $table->dateTime('end_time');  
-            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pendiente', 'confirmada', 'cancelada'])->default('pendiente');
             $table->string('user_name');
             $table->string('user_email');
             $table->text('notes')->nullable();

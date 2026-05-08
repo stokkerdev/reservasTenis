@@ -46,17 +46,18 @@ Route::middleware([
         Route::get('/admin/reservations', [ReservationController::class, 'indexWeb'])->name('reservations.admin.index');
 
         // Availabilities management
-        Route::get('/admin/availabilities', [AvailabilityController::class, 'indexWeb'])->name('availabilities.index');
-        Route::get('/admin/availabilities/create', [AvailabilityController::class, 'createWeb'])->name('availabilities.create');
-        Route::post('/admin/availabilities', [AvailabilityController::class, 'storeWeb'])->name('availabilities.store');
-        Route::get('/admin/availabilities/{availability}/edit', [AvailabilityController::class, 'editWeb'])->name('availabilities.edit');
-        Route::put('/admin/availabilities/{availability}', [AvailabilityController::class, 'updateWeb'])->name('availabilities.update');
-        Route::delete('/admin/availabilities/{availability}', [AvailabilityController::class, 'destroyWeb'])->name('availabilities.destroy');
+        Route::get('/admin/availabilities', [AvailabilityController::class, 'indexWeb'])->name('admin.availabilities.index');
+        Route::get('/admin/availabilities/create', [AvailabilityController::class, 'createWeb'])->name('admin.availabilities.create');
+        Route::post('/admin/availabilities', [AvailabilityController::class, 'storeWeb'])->name('admin.availabilities.store');
+        Route::get('/admin/availabilities/{availability}/edit', [AvailabilityController::class, 'editWeb'])->name('admin.availabilities.edit');
+        Route::put('/admin/availabilities/{availability}', [AvailabilityController::class, 'updateWeb'])->name('admin.availabilities.update');
+        Route::delete('/admin/availabilities/{availability}', [AvailabilityController::class, 'destroyWeb'])->name('admin.availabilities.destroy');
     });
 
     // User routes
-    Route::get('/reservations', [ReservationController::class, 'userReservationsWeb'])->name('reservations.user.index');
+    Route::get('reservations', [ReservationController::class, 'userReservationsWeb'])->name('reservations.user.index');
     Route::get('/reservations/create', [ReservationController::class, 'createWeb'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'storeWeb'])->name('reservations.store');
+    Route::get('/spaces/{space}/available-time-blocks', [ReservationController::class, 'getAvailableTimeBlocksWeb'])->name('spaces.available-time-blocks');
     Route::get('/spaces/{space}', [SpaceController::class, 'showWeb'])->name('spaces.show');
 });

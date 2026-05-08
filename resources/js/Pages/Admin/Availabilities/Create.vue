@@ -8,7 +8,7 @@
             <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <form @submit.prevent="form.post(route('availabilities.store'))" class="space-y-6">
+                        <form @submit.prevent="form.post(route('admin.availabilities.store'))" class="space-y-6">
                             <!-- Cancha -->
                             <div>
                                 <label for="space_id" class="block text-sm font-medium text-gray-700 mb-2">Cancha</label>
@@ -82,7 +82,7 @@
                                 >
                                     Crear Disponibilidad
                                 </button>
-                                <Link :href="route('availabilities.index')" class="flex-1 bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 transition text-center">
+                                <Link :href="route('admin.availabilities.index')" class="flex-1 bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 transition text-center">
                                     Cancelar
                                 </Link>
                             </div>

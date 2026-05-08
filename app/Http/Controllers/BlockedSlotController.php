@@ -54,11 +54,40 @@ class BlockedSlotController extends Controller
     }
 
     /**
+     * Store a newly created blocked slot (Web/Inertia).
+     */
+    public function storeWeb(Request $request)
+    {
+        $validated = $request->validate([
+            'space_id' => 'required|exists:spaces,id',
+            'start_time' => 'required|date_format:Y-m-d H:i:s',
+            'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        if (Reservation::hasConflict($validated['space_id'], $validated['start_time'], $validated['end_time'])) {
+            return redirect()->back()->with('error', 'Conflicto de horario. Ya existe una reserva o bloqueo en ese período.');
+        }
+
+        $blockedSlot = BlockedSlot::create($validated);
+        return redirect()->route('admin.blocked-slots.index')->with('success', 'Bloqueo creado correctamente.');
+    }
+
+    /**
      * Remove the specified blocked slot (API).
      */
     public function destroy(BlockedSlot $blockedSlot)
     {
         $blockedSlot->delete();
         return response()->json(['message' => 'Bloqueo eliminado correctamente']);
+    }
+
+    /**
+     * Remove the specified blocked slot (Web/Inertia).
+     */
+    public function destroyWeb(BlockedSlot $blockedSlot)
+    {
+        $blockedSlot->delete();
+        return redirect()->route('admin.blocked-slots.index')->with('success', 'Bloqueo eliminado correctamente.');
     }
 }
