@@ -17,10 +17,10 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
                                 >
                                     <option value="">Todos los estados</option>
-                                    <option value="pendiente">Pendiente</option>
-                                    <option value="confirmada">Confirmada</option>
-                                    <option value="rechazada">Rechazada</option>
-                                    <option value="cancelada">Cancelada</option>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="confirmed">Confirmada</option>
+                                    <option value="rejected">Rechazada</option>
+                                    <option value="cancelled">Cancelada</option>
                                 </select>
                             </div>
                         </div>
@@ -53,38 +53,45 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-sm">
-                                        <div class="flex gap-3">
+                                        <div class="flex flex-wrap gap-2">
                                             <button
-                                                v-if="reservation.status !== 'confirmada'"
+                                                v-if="reservation.status !== 'confirmed'"
                                                 @click="updateStatus(reservation.id, 'accept')"
-                                                class="text-green-600 hover:text-green-900 font-semibold"
+                                                class="px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-xs font-bold"
                                                 title="Aprobar"
                                             >
                                                 Aprobar
                                             </button>
                                             <button
-                                                v-if="reservation.status !== 'pendiente'"
+                                                v-if="reservation.status !== 'pending'"
                                                 @click="updateStatus(reservation.id, 'set-pending')"
-                                                class="text-yellow-600 hover:text-yellow-900 font-semibold"
+                                                class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 text-xs font-bold"
                                                 title="Pendiente"
                                             >
                                                 Pendiente
                                             </button>
                                             <button
-                                                v-if="reservation.status !== 'rechazada'"
+                                                v-if="reservation.status !== 'rejected'"
                                                 @click="updateStatus(reservation.id, 'reject')"
-                                                class="text-red-600 hover:text-red-900 font-semibold"
+                                                class="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-bold"
                                                 title="Rechazar"
                                             >
                                                 Rechazar
                                             </button>
                                             <button
-                                                v-if="reservation.status !== 'cancelada'"
+                                                v-if="reservation.status !== 'cancelled'"
                                                 @click="updateStatus(reservation.id, 'cancel')"
-                                                class="text-gray-600 hover:text-gray-900 font-semibold"
+                                                class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs font-bold"
                                                 title="Cancelar"
                                             >
                                                 Cancelar
+                                            </button>
+                                            <button
+                                                @click="deleteReservation(reservation.id)"
+                                                class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-bold"
+                                                title="Eliminar"
+                                            >
+                                                Eliminar
                                             </button>
                                         </div>
                                     </td>
@@ -131,20 +138,20 @@ const formatDateTime = (dateTime) => {
 const getStatusClass = (status) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
     const statusClasses = {
-        'pendiente': 'bg-yellow-100 text-yellow-800',
-        'confirmada': 'bg-green-100 text-green-800',
-        'rechazada': 'bg-red-100 text-red-800',
-        'cancelada': 'bg-gray-100 text-gray-800',
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'confirmed': 'bg-green-100 text-green-800',
+        'rejected': 'bg-red-100 text-red-800',
+        'cancelled': 'bg-gray-100 text-gray-800',
     };
     return `${baseClass} ${statusClasses[status] || 'bg-blue-100 text-blue-800'}`;
 };
 
 const getStatusLabel = (status) => {
     const labels = {
-        'pendiente': 'Pendiente',
-        'confirmada': 'Confirmada',
-        'rechazada': 'Rechazada',
-        'cancelada': 'Cancelada',
+        'pending': 'Pendiente',
+        'confirmed': 'Confirmada',
+        'rejected': 'Rechazada',
+        'cancelled': 'Cancelada',
     };
     return labels[status] || status;
 };
@@ -159,7 +166,8 @@ const updateStatus = async (reservationId, action) => {
 
     if (confirm(confirmMessages[action])) {
         try {
-            const response = await fetch(`/api/reservations/${reservationId}/${action}`, {
+            // Usamos las rutas web definidas en web.php
+            const response = await fetch(`/admin/reservations/${reservationId}/${action}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -176,6 +184,30 @@ const updateStatus = async (reservationId, action) => {
         } catch (error) {
             console.error('Error:', error);
             alert('Error de red al intentar actualizar la reserva');
+        }
+    }
+};
+
+const deleteReservation = async (reservationId) => {
+    if (confirm('¿Estás seguro de que quieres ELIMINAR permanentemente esta reserva? Esta acción no se puede deshacer.')) {
+        try {
+            const response = await fetch(`/admin/reservations/${reservationId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                },
+            });
+
+            if (response.ok) {
+                router.reload();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Error al eliminar la reserva');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error de red al intentar eliminar la reserva');
         }
     }
 };

@@ -155,7 +155,12 @@ class ReservationController extends Controller
         }
         
         $reservation->delete();
-        return response()->json(['message' => 'Reserva eliminada correctamente']);
+
+        if (request()->wantsJson()) {
+            return response()->json(['message' => 'Reserva eliminada correctamente']);
+        }
+
+        return redirect()->back()->with('message', 'Reserva eliminada correctamente');
     }
 
     public function updateWeb(ReservationRequest $request, string $id)

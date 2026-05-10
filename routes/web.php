@@ -51,7 +51,11 @@ Route::middleware([
         Route::get('/admin/reservations', [ReservationController::class, 'indexWeb'])->name('reservations.admin.index');
         Route::get('/admin/reservations/{reservation}/edit', [ReservationController::class, 'editWeb'])->name('reservations.admin.edit');
         Route::put('/admin/reservations/{reservation}', [ReservationController::class, 'updateWeb'])->name('reservations.admin.update');
-        Route::delete('/admin/reservations/{reservation}', [ReservationController::class, 'destroyWeb'])->name('reservations.admin.destroy');
+        Route::delete('/admin/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.admin.destroy');
+        Route::post('/admin/reservations/{reservation}/accept', [ReservationController::class, 'accept'])->name('reservations.admin.accept');
+        Route::post('/admin/reservations/{reservation}/reject', [ReservationController::class, 'reject'])->name('reservations.admin.reject');
+        Route::post('/admin/reservations/{reservation}/set-pending', [ReservationController::class, 'setPending'])->name('reservations.admin.set-pending');
+        Route::post('/admin/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.admin.cancel');
 
         // Availabilities management
         Route::get('/admin/availabilities', [AvailabilityController::class, 'indexWeb'])->name('admin.availabilities.index');
