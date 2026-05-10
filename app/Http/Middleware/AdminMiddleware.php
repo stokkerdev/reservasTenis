@@ -19,7 +19,7 @@ class AdminMiddleware
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Acceso denegado. Se requieren permisos de administrador.'], 403);
             }
-            return redirect()->route('dashboard')->with('error', 'No tienes permiso para acceder a esta sección.');
+            return redirect()->route('reservations')->with('error', 'No tienes permiso para acceder a esta sección.');
         }
 
         return $next($request);

@@ -34,29 +34,32 @@ defineProps({
             </div>
             
             <div v-if="canLogin" class="flex gap-4">
-                <!-- Dashboard link commented out -->
-                <!-- <Link
+
+                
+                <Link
                     v-if="$page.props.auth.user"
                     :href="route('dashboard')"
                     class="px-4 py-2 text-tennis-green font-semibold hover:bg-tennis-green/5 rounded-lg transition"
                 >
                     Dashboard
-                </Link> -->
-
-                <Link
-                    :href="route('login')"
-                    class="px-4 py-2 text-tennis-green font-semibold hover:bg-tennis-green/5 rounded-lg transition"
-                >
-                    Iniciar Sesión
                 </Link>
 
-                <Link
-                    v-if="canRegister"
-                    :href="route('register')"
-                    class="px-4 py-2 bg-tennis-green text-white font-bold rounded-lg shadow-md hover:bg-green-800 transition transform hover:-translate-y-0.5"
-                >
-                    Registrarse
-                </Link>
+                <template v-else>
+                    <Link
+                        :href="route('login')"
+                        class="px-4 py-2 text-tennis-green font-semibold hover:bg-tennis-green/5 rounded-lg transition"
+                    >
+                        Iniciar Sesión
+                    </Link>
+
+                    <Link
+                        v-if="canRegister"
+                        :href="route('register')"
+                        class="px-4 py-2 bg-tennis-green text-white font-bold rounded-lg shadow-md hover:bg-green-800 transition transform hover:-translate-y-0.5"
+                    >
+                        Registrarse
+                    </Link>
+                </template>
             </div>
         </nav>
 

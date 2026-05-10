@@ -76,7 +76,7 @@ class ReservationController extends Controller
             return response()->json(['errors' => ['general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.']], 409);
         }
 
-        $data['status'] = 'confirmada';
+        $data['status'] = 'confirmed';
         $reservation = Reservation::create($data);
         
         return response()->json(['message' => 'Reserva creada correctamente.', 'reservation' => $reservation->load('space')], 201);
