@@ -49,7 +49,7 @@ class Reservation extends Model
     {
         // Check for overlapping reservations
         $conflictingReservations = self::where('space_id', $spaceId)
-            ->where('status', '!=', 'cancelada') // Canceled reservations don't conflict
+            ->where('status', '!=', 'cancelled') // Canceled reservations don't conflict
             ->where(function ($query) use ($startTime, $endTime) {
                 $query->whereBetween('start_time', [$startTime, $endTime])
                       ->orWhereBetween('end_time', [$startTime, $endTime])

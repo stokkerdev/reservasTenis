@@ -76,7 +76,7 @@ class ReservationController extends Controller
             return response()->json(['errors' => ['general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.']], 409);
         }
 
-        $data['status'] = 'confirmada';
+        $data['status'] = 'confirmed';
         $reservation = Reservation::create($data);
 
         return response()->json(['message' => 'Reserva creada correctamente.', 'reservation' => $reservation->load('space')], 201);
@@ -97,7 +97,7 @@ class ReservationController extends Controller
             return response()->json(['message' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.'], 409);
         }
 
-        $data['status'] = 'confirmada'; // Auto-confirm if no conflicts
+        $data['status'] = 'confirmed'; // Auto-confirm if no conflicts
 
         $reservation = Reservation::create($data);
         return response()->json($reservation->load('space'), 201);
@@ -184,7 +184,7 @@ class ReservationController extends Controller
     public function accept($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'confirmada']);
+        $reservation->update(['status' => 'confirmed']);
 
         return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
     }
@@ -195,7 +195,7 @@ class ReservationController extends Controller
     public function reject($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'rechazada']);
+        $reservation->update(['status' => 'rejected']);
 
         return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
     }
@@ -206,7 +206,7 @@ class ReservationController extends Controller
     public function setPending($id)
     {
         $reservation = Reservation::findOrFail($id);
-        $reservation->update(['status' => 'pendiente']);
+        $reservation->update(['status' => 'pending']);
 
         return response()->json(['message' => 'Reserva puesta en pendiente', 'reservation' => $reservation]);
     }
@@ -222,7 +222,7 @@ class ReservationController extends Controller
             return response()->json(['message' => 'No tienes permiso para cancelar esta reserva.'], 403);
         }
 
-        $reservation->update(['status' => 'cancelada']);
+        $reservation->update(['status' => 'cancelled']);
 
         return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
     }
