@@ -134,10 +134,19 @@ const fetchAvailableBlocks = async () => {
     if (!form.space_id || !form.date) return;
 
     try {
-        const response = await fetch(`/api/spaces/${form.space_id}/available-time-blocks?date=${form.date}&exclude_reservation_id=${props.reservation.id}`);
+        const response = await fetch(`/spaces/${form.space_id}/available-time-blocks?date=${form.date}&exclude_reservation_id=${props.reservation.id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch available time blocks');
+        }
         const data = await response.json();
         availableBlocks.value = data;
-        
+
         // Si la fecha y espacio son los originales, intentar preseleccionar el bloque actual
         const currentStartTime = props.reservation.start_time;
         const matchingBlock = availableBlocks.value.find(b => b.start_time === currentStartTime);
@@ -156,7 +165,7 @@ const formatTime = (dateTime) => {
 };
 
 const submitForm = async () => {
-    isSubmitting.value = ref(true);
+    isSubmitting.value = true;
     errors.value = {};
 
     try {
@@ -165,8 +174,10 @@ const submitForm = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 space_id: form.space_id,
                 start_time: selectedBlock.value.start_time,
