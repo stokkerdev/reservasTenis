@@ -45,6 +45,8 @@ Route::middleware([
         Route::get('/admin/blocked-slots', [BlockedSlotController::class, 'indexWeb'])->name('admin.blocked-slots.index');
         Route::get('/admin/blocked-slots/create', [BlockedSlotController::class, 'createWeb'])->name('admin.blocked-slots.create');
         Route::post('/admin/blocked-slots', [BlockedSlotController::class, 'storeWeb'])->name('admin.blocked-slots.store');
+        Route::get('/admin/blocked-slots/{blockedSlot}/edit', [BlockedSlotController::class, 'editWeb'])->name('admin.blocked-slots.edit');
+        Route::put('/admin/blocked-slots/{blockedSlot}', [BlockedSlotController::class, 'updateWeb'])->name('admin.blocked-slots.update');
         Route::delete('/admin/blocked-slots/{blockedSlot}', [BlockedSlotController::class, 'destroyWeb'])->name('admin.blocked-slots.destroy');
 
         // Reservations management

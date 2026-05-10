@@ -45,18 +45,16 @@ class Reservation extends Model
      * @param int|null $reservationId Exclude this reservation ID from conflict check (for updates).
      * @return bool True if a conflict exists, false otherwise.
      */
-    public static function hasConflict(int $spaceId, string $startTime, string $endTime, ?int $reservationId = null): bool
+    public static function hasConflict(int $spaceId, string $startTime, string $endTime, ?int $reservationId = null, ?int $blockedSlotId = null): bool
     {
         // Check for overlapping reservations
         $conflictingReservations = self::where('space_id', $spaceId)
-            ->where('status', '!=', 'cancelled') // Canceled reservations don't conflict
+            ->where('status', '!=', 'cancelled')
             ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                      ->orWhereBetween('end_time', [$startTime, $endTime])
-                      ->orWhere(function ($query) use ($startTime, $endTime) {
-                          $query->where('start_time', '<', $startTime)
-                                ->where('end_time', '>', $endTime);
-                      });
+                $query->where(function ($q) use ($startTime, $endTime) {
+                    $q->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+                });
             });
 
         if ($reservationId) {
@@ -70,15 +68,14 @@ class Reservation extends Model
         // Check for overlapping blocked slots
         $conflictingBlockedSlots = BlockedSlot::where('space_id', $spaceId)
             ->where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                      ->orWhereBetween('end_time', [$startTime, $endTime])
-                      ->orWhere(function ($query) use ($startTime, $endTime) {
-                          $query->where('start_time', '<', $startTime)
-                                ->where('end_time', '>', $endTime);
-                      });
-            })
-            ->exists();
+                $query->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+            });
 
-        return $conflictingBlockedSlots;
+        if ($blockedSlotId) {
+            $conflictingBlockedSlots->where('id', '!=', $blockedSlotId);
+        }
+
+        return $conflictingBlockedSlots->exists();
     }
 }

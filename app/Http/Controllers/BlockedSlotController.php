@@ -83,6 +83,39 @@ class BlockedSlotController extends Controller
     }
 
     /**
+     * Show edit form for admin (Web view).
+     */
+    public function editWeb(BlockedSlot $blockedSlot)
+    {
+        $spaces = Space::all();
+        return Inertia::render('Admin/BlockedSlots/Edit', [
+            'blockedSlot' => $blockedSlot,
+            'spaces' => $spaces,
+        ]);
+    }
+
+    /**
+     * Update the specified blocked slot (Web/Inertia).
+     */
+    public function updateWeb(Request $request, BlockedSlot $blockedSlot)
+    {
+        $validated = $request->validate([
+            'space_id' => 'required|exists:spaces,id',
+            'start_time' => 'required|date_format:Y-m-d H:i:s',
+            'end_time' => 'required|date_format:Y-m-d H:i:s|after:start_time',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        // Check for conflicts, excluding the current blocked slot
+        if (Reservation::hasConflict($validated['space_id'], $validated['start_time'], $validated['end_time'], null, $blockedSlot->id)) {
+            return redirect()->back()->with('error', 'Conflicto de horario. Ya existe una reserva o bloqueo en ese período.');
+        }
+
+        $blockedSlot->update($validated);
+        return redirect()->route('admin.blocked-slots.index')->with('success', 'Bloqueo actualizado correctamente.');
+    }
+
+    /**
      * Remove the specified blocked slot (Web/Inertia).
      */
     public function destroyWeb(BlockedSlot $blockedSlot)

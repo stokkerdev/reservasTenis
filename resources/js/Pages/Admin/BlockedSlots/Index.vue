@@ -36,9 +36,14 @@
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ formatDateTime(slot.end_time) }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ slot.reason }}</td>
                                     <td class="px-6 py-4 text-sm">
-                                        <button @click="deleteBlockedSlot(slot.id)" class="text-red-600 hover:text-red-900 font-semibold">
-                                            Eliminar
-                                        </button>
+                                        <div class="flex gap-3">
+                                            <Link :href="`/admin/blocked-slots/${slot.id}/edit`" class="text-tennis-cyan hover:text-cyan-700 font-semibold">
+                                                Editar
+                                            </Link>
+                                            <button @click="deleteBlockedSlot(slot.id)" class="text-red-600 hover:text-red-900 font-semibold">
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -55,7 +60,7 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 defineProps({
     blockedSlots: Array,
@@ -65,14 +70,9 @@ const formatDateTime = (dateTime) => {
     return new Date(dateTime).toLocaleString('es-AR');
 };
 
-const deleteBlockedSlot = async (slotId) => {
+const deleteBlockedSlot = (slotId) => {
     if (confirm('¿Estás seguro de que deseas eliminar este bloqueo?')) {
-        try {
-            await fetch(`/api/blocked-slots/${slotId}`, { method: 'DELETE' });
-            window.location.reload();
-        } catch (error) {
-            console.error('Error al eliminar:', error);
-        }
+        router.delete(`/admin/blocked-slots/${slotId}`);
     }
 };
 </script>
