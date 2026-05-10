@@ -1,5 +1,5 @@
 <template>
-    <AppLayout>
+    <AppLayout title="Gestión de Reservas">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Gestión de Reservas</h2>
         </template>
@@ -53,20 +53,38 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-sm">
-                                        <div class="flex gap-2">
+                                        <div class="flex gap-3">
                                             <button
-                                                v-if="reservation.status === 'pendiente'"
-                                                @click="acceptReservation(reservation.id)"
+                                                v-if="reservation.status !== 'confirmada'"
+                                                @click="updateStatus(reservation.id, 'accept')"
                                                 class="text-green-600 hover:text-green-900 font-semibold"
+                                                title="Aprobar"
                                             >
                                                 Aprobar
                                             </button>
                                             <button
-                                                v-if="reservation.status === 'pendiente'"
-                                                @click="rejectReservation(reservation.id)"
+                                                v-if="reservation.status !== 'pendiente'"
+                                                @click="updateStatus(reservation.id, 'set-pending')"
+                                                class="text-yellow-600 hover:text-yellow-900 font-semibold"
+                                                title="Pendiente"
+                                            >
+                                                Pendiente
+                                            </button>
+                                            <button
+                                                v-if="reservation.status !== 'rechazada'"
+                                                @click="updateStatus(reservation.id, 'reject')"
                                                 class="text-red-600 hover:text-red-900 font-semibold"
+                                                title="Rechazar"
                                             >
                                                 Rechazar
+                                            </button>
+                                            <button
+                                                v-if="reservation.status !== 'cancelada'"
+                                                @click="updateStatus(reservation.id, 'cancel')"
+                                                class="text-gray-600 hover:text-gray-900 font-semibold"
+                                                title="Cancelar"
+                                            >
+                                                Cancelar
                                             </button>
                                         </div>
                                     </td>
@@ -86,6 +104,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     reservations: Array,
@@ -99,56 +118,64 @@ const filteredReservations = computed(() => {
 });
 
 const formatDateTime = (dateTime) => {
-    return new Date(dateTime).toLocaleString('es-AR');
+    return new Date(dateTime).toLocaleString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
 };
 
 const getStatusClass = (status) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
     const statusClasses = {
-        pending: 'bg-yellow-100 text-yellow-800',
-        confirmed: 'bg-green-100 text-green-800',
-        canceled: 'bg-gray-100 text-gray-800',
+        'pendiente': 'bg-yellow-100 text-yellow-800',
+        'confirmada': 'bg-green-100 text-green-800',
+        'rechazada': 'bg-red-100 text-red-800',
+        'cancelada': 'bg-gray-100 text-gray-800',
     };
-    return `${baseClass} ${statusClasses[status] || ''}`;
+    return `${baseClass} ${statusClasses[status] || 'bg-blue-100 text-blue-800'}`;
 };
 
 const getStatusLabel = (status) => {
     const labels = {
-        pending: 'Pendiente',
-        confirmed: 'Confirmada',
-        cancelled: 'Cancelada',
+        'pendiente': 'Pendiente',
+        'confirmada': 'Confirmada',
+        'rechazada': 'Rechazada',
+        'cancelada': 'Cancelada',
     };
     return labels[status] || status;
 };
 
-const acceptReservation = async (reservationId) => {
-    if (confirm('¿Confirmar esta reserva?')) {
-        try {
-            await fetch(`/api/reservations/${reservationId}/accept`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                },
-            });
-            window.location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-};
+const updateStatus = async (reservationId, action) => {
+    const confirmMessages = {
+        'accept': '¿Estás seguro de que quieres APROBAR esta reserva?',
+        'reject': '¿Estás seguro de que quieres RECHAZAR esta reserva?',
+        'set-pending': '¿Estás seguro de que quieres poner esta reserva en PENDIENTE?',
+        'cancel': '¿Estás seguro de que quieres CANCELAR esta reserva?',
+    };
 
-const rejectReservation = async (reservationId) => {
-    if (confirm('¿Rechazar esta reserva?')) {
+    if (confirm(confirmMessages[action])) {
         try {
-            await fetch(`/api/reservations/${reservationId}/reject`, {
+            const response = await fetch(`/api/reservations/${reservationId}/${action}`, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
                 },
             });
-            window.location.reload();
+
+            if (response.ok) {
+                router.reload();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Error al actualizar el estado de la reserva');
+            }
         } catch (error) {
             console.error('Error:', error);
+            alert('Error de red al intentar actualizar la reserva');
         }
     }
 };

@@ -25,9 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::apiResource('availabilities', AvailabilityController::class);
         
-        // Admin reservation actions (approve/reject/cancel)
+        // Admin reservation actions (approve/reject/pending)
         Route::post('reservations/{id}/accept', [ReservationController::class, 'accept']);
         Route::post('reservations/{id}/reject', [ReservationController::class, 'reject']);
+        Route::post('reservations/{id}/set-pending', [ReservationController::class, 'setPending']);
     });
 
     // Shared routes (Admin and User)

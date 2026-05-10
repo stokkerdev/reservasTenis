@@ -76,7 +76,7 @@ class ReservationController extends Controller
             return response()->json(['errors' => ['general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.']], 409);
         }
 
-        $data['status'] = 'confirmed';
+        $data['status'] = 'confirmada';
         $reservation = Reservation::create($data);
 
         return response()->json(['message' => 'Reserva creada correctamente.', 'reservation' => $reservation->load('space')], 201);
@@ -130,15 +130,13 @@ class ReservationController extends Controller
         return response()->json($reservation->load('space'));
     }
 
-
-
     public function editWeb(string $id)
     {
         $reservation = Reservation::with('space')->findOrFail($id);
         $spaces = Space::where('is_active', true)->get();
 
         if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return redirect()->route('reservations')->with('error', 'No tienes permiso para editar esta reserva.');
+            return redirect()->route('reservations.user.index')->with('error', 'No tienes permiso para editar esta reserva.');
         }
 
         return Inertia::render('Reservations/Edit', [
@@ -147,8 +145,6 @@ class ReservationController extends Controller
         ]);
     }
 
-   
-    
     public function destroy(string $id)
     {
         $reservation = Reservation::findOrFail($id);
@@ -166,23 +162,20 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
 
-        // Aqui reviso si puede editar, si el usuario es duiaño de su porpia reserva, si la puede editar o si es admin
         if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
-            return redirect()->route('reservations')->with('error', 'No tienes permiso para editar esta reserva.');
+            return response()->json(['errors' => ['general' => 'No tienes permiso para editar esta reserva.']], 403);
         }
 
         $data = $request->validated();
 
         // Check for conflicts, excluding the current reservation
         if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'], $reservation->id)) {
-            return redirect()->back()->withInput()->withErrors([
-                'general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.'
-            ]);
+            return response()->json(['errors' => ['general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.']], 409);
         }
 
         $reservation->update($data);
 
-        return redirect()->route('reservations')->with('success', 'Reserva actualizada correctamente.');
+        return response()->json(['message' => 'Reserva actualizada correctamente.', 'reservation' => $reservation->load('space')], 200);
     }
 
     /**
@@ -192,8 +185,6 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'confirmada']);
-
-        // TODO: Enviar correo de confirmación
 
         return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
     }
@@ -206,9 +197,18 @@ class ReservationController extends Controller
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'rechazada']);
 
-        // TODO: Enviar correo de rechazo
-
         return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
+    }
+
+    /**
+     * Admin: Set reservation to pending.
+     */
+    public function setPending($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update(['status' => 'pendiente']);
+
+        return response()->json(['message' => 'Reserva puesta en pendiente', 'reservation' => $reservation]);
     }
 
     /**
@@ -218,47 +218,17 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
 
-        if (!in_array($reservation->status, ['pendiente', 'confirmada'])) {
-            return response()->json(['message' => 'No se puede cancelar una reserva en estado ' . $reservation->status], 422);
+        if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return response()->json(['message' => 'No tienes permiso para cancelar esta reserva.'], 403);
         }
 
         $reservation->update(['status' => 'cancelada']);
-
-        // TODO: Enviar correo de cancelación
 
         return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
     }
 
     /**
-     * Get available time blocks for a specific space and date (Web/Inertia).
-     */
-    public function getAvailableTimeBlocksWeb(Request $request, Space $space)
-    {
-        $request->validate([
-            'date' => 'required|date_format:Y-m-d',
-        ]);
-
-        $date = Carbon::parse($request->input('date'));
-        $intervalMinutes = 60;
-
-        $allBlocks = $space->generateTimeBlocks($date, $intervalMinutes);
-
-        $availableBlocks = [];
-        foreach ($allBlocks as $block) {
-            if (!Reservation::hasConflict($space->id, $block['start_time'], $block['end_time'])) {
-                $availableBlocks[] = $block;
-            }
-        }
-
-        return response()->json($availableBlocks);
-    }
-
-    /**
      * Get available time blocks for a specific space and date.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Space $space
-     * @return \Illuminate\Http\JsonResponse
      */
     public function getAvailableTimeBlocks(Request $request, Space $space)
     {
@@ -271,9 +241,12 @@ class ReservationController extends Controller
 
         $allBlocks = $space->generateTimeBlocks($date, $intervalMinutes);
 
+        // Si estamos editando, necesitamos saber qué reserva estamos editando para no marcar su propio bloque como ocupado
+        $excludeReservationId = $request->query('exclude_reservation_id');
+
         $availableBlocks = [];
         foreach ($allBlocks as $block) {
-            if (!Reservation::hasConflict($space->id, $block['start_time'], $block['end_time'])) {
+            if (!Reservation::hasConflict($space->id, $block['start_time'], $block['end_time'], $excludeReservationId)) {
                 $availableBlocks[] = $block;
             }
         }
