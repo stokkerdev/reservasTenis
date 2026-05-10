@@ -41,7 +41,7 @@ defineProps({
                     :href="route('dashboard')"
                     class="px-4 py-2 text-tennis-green font-semibold hover:bg-tennis-green/5 rounded-lg transition"
                 >
-                    Dashboard
+                    Tablero Principal
                 </Link>
 
                 <template v-else>
