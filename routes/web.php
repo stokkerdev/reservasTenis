@@ -7,6 +7,7 @@ use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\BlockedSlotController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AvailabilityController;
+use App\Http\Controllers\StatisticsController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -22,8 +23,12 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+    // Dashboard con estadísticas según rol
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        if (auth()->user()->isAdmin()) {
+            return app(StatisticsController::class)->adminDashboard();
+        }
+        return app(StatisticsController::class)->clientDashboard();
     })->name('dashboard');
 
     // Admin routes

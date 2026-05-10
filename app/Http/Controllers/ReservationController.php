@@ -228,7 +228,33 @@ class ReservationController extends Controller
     }
 
     /**
-     * Get available time blocks for a specific space and date.
+     * Get available time blocks for a specific space and date (Web/Inertia).
+     */
+    public function getAvailableTimeBlocksWeb(Request $request, Space $space)
+    {
+        $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+        ]);
+
+        $date = Carbon::parse($request->input('date'));
+        $intervalMinutes = (int) env('RESERVATION_SLOT_MINUTES', 60);
+
+        $allBlocks = $space->generateTimeBlocks($date, $intervalMinutes);
+
+        $excludeReservationId = $request->query('exclude_reservation_id');
+
+        $availableBlocks = [];
+        foreach ($allBlocks as $block) {
+            if (!Reservation::hasConflict($space->id, $block['start_time'], $block['end_time'], $excludeReservationId)) {
+                $availableBlocks[] = $block;
+            }
+        }
+
+        return response()->json($availableBlocks);
+    }
+
+    /**
+     * Get available time blocks for a specific space and date (API).
      */
     public function getAvailableTimeBlocks(Request $request, Space $space)
     {
