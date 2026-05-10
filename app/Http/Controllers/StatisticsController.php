@@ -58,10 +58,13 @@ class StatisticsController extends Controller
             ->values();
 
         // Reservas por mes (últimos 6 meses)
+        $driver = DB::getDriverName();
+        $monthFormat = $driver === 'pgsql' ? "TO_CHAR(start_time, 'YYYY-MM')" : "DATE_FORMAT(start_time, '%Y-%m')";
+
         $reservationsByMonth = Reservation::where('user_id', $userId)
             ->where('start_time', '>=', Carbon::now()->subMonths(6)->startOfMonth())
             ->select(
-                DB::raw("DATE_FORMAT(start_time, '%Y-%m') as month"),
+                DB::raw("$monthFormat as month"),
                 DB::raw('COUNT(*) as total')
             )
             ->groupBy('month')
@@ -145,9 +148,12 @@ class StatisticsController extends Controller
         $totalRevenue = $revenueBySpace->sum('revenue');
 
         // Reservas por mes (últimos 6 meses)
+        $driver = DB::getDriverName();
+        $monthFormat = $driver === 'pgsql' ? "TO_CHAR(start_time, 'YYYY-MM')" : "DATE_FORMAT(start_time, '%Y-%m')";
+
         $reservationsByMonth = Reservation::where('start_time', '>=', Carbon::now()->subMonths(6)->startOfMonth())
             ->select(
-                DB::raw("DATE_FORMAT(start_time, '%Y-%m') as month"),
+                DB::raw("$monthFormat as month"),
                 DB::raw('COUNT(*) as total')
             )
             ->groupBy('month')
