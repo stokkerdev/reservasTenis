@@ -47,10 +47,10 @@ const logout = () => {
 
                                 <!-- Admin Links -->
                                 <template v-if="$page.props.auth.user.role === 'admin'">
-                                    <NavLink :href="route('spaces.index')" :active="route().current('spaces.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                    <NavLink :href="route('admin.spaces.index')" :active="route().current('admin.spaces.index')" class="text-white hover:text-tennis-cyan transition-colors">
                                         Canchas
                                     </NavLink>
-                                    <NavLink :href="route('blocked-slots.index')" :active="route().current('blocked-slots.index')" class="text-white hover:text-tennis-cyan transition-colors">
+                                    <NavLink :href="route('admin.blocked-slots.index')" :active="route().current('admin.blocked-slots.index')" class="text-white hover:text-tennis-cyan transition-colors">
                                         Bloqueos
                                     </NavLink>
                                     <NavLink :href="route('reservations.admin.index')" :active="route().current('reservations.admin.index')" class="text-white hover:text-tennis-cyan transition-colors">
@@ -133,10 +133,10 @@ const logout = () => {
                         </ResponsiveNavLink>
 
                         <template v-if="$page.props.auth.user.role === 'admin'">
-                            <ResponsiveNavLink :href="route('spaces.index')" :active="route().current('spaces.index')" class="text-white">
+                            <ResponsiveNavLink :href="route('admin.spaces.index')" :active="route().current('admin.spaces.index')" class="text-white">
                                 Canchas
                             </ResponsiveNavLink>
-                            <ResponsiveNavLink :href="route('blocked-slots.index')" :active="route().current('blocked-slots.index')" class="text-white">
+                            <ResponsiveNavLink :href="route('admin.blocked-slots.index')" :active="route().current('admin.blocked-slots.index')" class="text-white">
                                 Bloqueos
                             </ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('reservations.admin.index')" :active="route().current('reservations.admin.index')" class="text-white">

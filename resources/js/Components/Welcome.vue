@@ -50,7 +50,7 @@ import { Link } from '@inertiajs/vue3';
                     {{ $page.props.auth.user.role === 'admin' ? 'Administra las canchas, bloquea horarios y configura disponibilidad.' : 'Explora las canchas de césped, arcilla y cemento listas para jugar.' }}
                 </p>
                 <Link 
-                    :href="$page.props.auth.user.role === 'admin' ? route('spaces.index') : route('reservations.create')"
+                    :href="$page.props.auth.user.role === 'admin' ? route('admin.spaces.index') : route('reservations.create')"
                     class="inline-flex items-center text-blue-600 font-semibold hover:underline"
                 >
                     {{ $page.props.auth.user.role === 'admin' ? 'Configurar espacios →' : 'Reservar ahora →' }}

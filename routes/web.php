@@ -34,18 +34,18 @@ Route::middleware([
     // Admin routes
     Route::middleware('admin')->group(function () {
         // Spaces management
-        Route::get('/admin/spaces', [SpaceController::class, 'indexWeb'])->name('spaces.index');
-        Route::get('/admin/spaces/create', [SpaceController::class, 'createWeb'])->name('spaces.create');
-        Route::post('/admin/spaces', [SpaceController::class, 'storeWeb'])->name('spaces.store');
-        Route::get('/admin/spaces/{space}/edit', [SpaceController::class, 'editWeb'])->name('spaces.edit');
-        Route::put('/admin/spaces/{space}', [SpaceController::class, 'updateWeb'])->name('spaces.update');
-        Route::delete('/admin/spaces/{space}', [SpaceController::class, 'destroyWeb'])->name('spaces.destroy');
+        Route::get('/admin/spaces', [SpaceController::class, 'indexWeb'])->name('admin.spaces.index');
+        Route::get('/admin/spaces/create', [SpaceController::class, 'createWeb'])->name('admin.spaces.create');
+        Route::post('/admin/spaces', [SpaceController::class, 'storeWeb'])->name('admin.spaces.store');
+        Route::get('/admin/spaces/{space}/edit', [SpaceController::class, 'editWeb'])->name('admin.spaces.edit');
+        Route::put('/admin/spaces/{space}', [SpaceController::class, 'updateWeb'])->name('admin.spaces.update');
+        Route::delete('/admin/spaces/{space}', [SpaceController::class, 'destroyWeb'])->name('admin.spaces.destroy');
 
         // BlockedSlots management
-        Route::get('/admin/blocked-slots', [BlockedSlotController::class, 'indexWeb'])->name('blocked-slots.index');
-        Route::get('/admin/blocked-slots/create', [BlockedSlotController::class, 'createWeb'])->name('blocked-slots.create');
-        Route::post('/admin/blocked-slots', [BlockedSlotController::class, 'storeWeb'])->name('blocked-slots.store');
-        Route::delete('/admin/blocked-slots/{blockedSlot}', [BlockedSlotController::class, 'destroyWeb'])->name('blocked-slots.destroy');
+        Route::get('/admin/blocked-slots', [BlockedSlotController::class, 'indexWeb'])->name('admin.blocked-slots.index');
+        Route::get('/admin/blocked-slots/create', [BlockedSlotController::class, 'createWeb'])->name('admin.blocked-slots.create');
+        Route::post('/admin/blocked-slots', [BlockedSlotController::class, 'storeWeb'])->name('admin.blocked-slots.store');
+        Route::delete('/admin/blocked-slots/{blockedSlot}', [BlockedSlotController::class, 'destroyWeb'])->name('admin.blocked-slots.destroy');
 
         // Reservations management
         Route::get('/admin/reservations', [ReservationController::class, 'indexWeb'])->name('reservations.admin.index');

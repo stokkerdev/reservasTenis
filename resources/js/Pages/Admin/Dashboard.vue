@@ -323,7 +323,7 @@ const formatCurrency = (val) =>
 
                 <!-- Accesos rápidos admin -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <a :href="route('spaces.index')"
+                    <a :href="route('admin.spaces.index')"
                         class="flex flex-col items-center gap-2 bg-white rounded-xl shadow p-4 hover:bg-gray-50 transition border border-gray-100 text-center">
                         <svg class="w-8 h-8 text-tennis-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -339,7 +339,7 @@ const formatCurrency = (val) =>
                         </svg>
                         <span class="text-sm font-medium text-gray-700">Reservas</span>
                     </a>
-                    <a :href="route('blocked-slots.index')"
+                    <a :href="route('admin.blocked-slots.index')"
                         class="flex flex-col items-center gap-2 bg-white rounded-xl shadow p-4 hover:bg-gray-50 transition border border-gray-100 text-center">
                         <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
