@@ -125,8 +125,6 @@
 import { reactive, ref, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { useForm, usePage } from '@inertiajs/inertia-vue3';
-
 
 const props = defineProps({
     reservation: Object,
@@ -186,16 +184,24 @@ const fetchAvailableBlocks = async () => {
             },
             credentials: 'same-origin',
         });
+        
         if (!response.ok) {
-            throw new Error('Failed to fetch available time blocks');
+            const errorText = await response.text();
+            console.error('Response status:', response.status, 'Response body:', errorText);
+            throw new Error(`Failed to fetch available time blocks: ${response.status} ${response.statusText}`);
         }
+        
         const data = await response.json();
         availableBlocks.value = data;
         selectedBlock.value = null;
     } catch (error) {
         console.error('Error fetching available blocks:', error);
+        console.error('Request URL:', `/spaces/${form.space_id}/available-time-blocks?date=${form.date}`);
         availableBlocks.value = [];
         selectedBlock.value = null;
+        
+        // Show user-friendly error message
+        errors.value.general = 'No se pudieron cargar los bloques horarios. Verifica que la cancha tenga disponibilidades configuradas para esa fecha.';
     }
 };
 
@@ -227,6 +233,12 @@ const submitForm = async () => {
         return;
     }
 
+    // Get CSRF token
+    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!csrfToken && typeof Ziggy !== 'undefined' && Ziggy.csrfToken) {
+        csrfToken = Ziggy.csrfToken;
+    }
+
     try {
         const response = await fetch(`/reservations/${reservation.id}`, {
             method: 'PUT',
@@ -234,7 +246,7 @@ const submitForm = async () => {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                'X-CSRF-TOKEN': csrfToken,
             },
             credentials: 'same-origin',
             body: JSON.stringify({

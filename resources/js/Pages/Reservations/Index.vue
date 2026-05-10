@@ -102,30 +102,31 @@ const getStatusLabel = (status) => {
     return labels[status] || status;
 };
 
-const cancelReservation = async (reservationId) => {
-    if (confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
-        try {
-            await fetch(`/api/reservations/${reservationId}/cancel`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                },
-            });
-            window.location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-};
+
 
 const deleteReservation = async (reservationId) => {
+    // Try to get CSRF token from meta tag
+    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    
+    // If not found in meta tag, try to get it from Ziggy (Laravel's JS route helper)
+    if (!csrfToken && typeof Ziggy !== 'undefined' && Ziggy.csrfToken) {
+        csrfToken = Ziggy.csrfToken;
+    }
+    
+    if (!csrfToken) {
+        alert('Error: No se pudo obtener el token CSRF');
+        return;
+    }
+    
     if (confirm('¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer.')) {
         try {
-            await fetch(`/api/reservations/${reservationId}`, {
+            await fetch(`/reservations/${reservationId}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
                 },
+                credentials: 'same-origin'
             });
             window.location.reload();
         } catch (error) {

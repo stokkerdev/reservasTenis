@@ -152,6 +152,12 @@ class ReservationController extends Controller
     public function destroy(string $id)
     {
         $reservation = Reservation::findOrFail($id);
+        
+        // Authorization check: user can only delete their own reservations, unless admin
+        if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return response()->json(['message' => 'No tienes permiso para eliminar esta reserva.'], 403);
+        }
+        
         $reservation->delete();
         return response()->json(['message' => 'Reserva eliminada correctamente']);
     }
