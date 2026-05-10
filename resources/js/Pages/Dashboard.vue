@@ -180,6 +180,24 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                     <h3 class="text-2xl font-bold mb-1">¡Hola, {{ user.name }}!</h3>
                     <p class="text-green-100">Aquí tienes un resumen de tu actividad en las canchas.</p>
                 </div>
+                  <!-- Accesos rápidos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Link :href="route('reservations.create')"
+                        class="flex items-center gap-3 bg-tennis-green text-white font-semibold px-6 py-4 rounded-xl hover:bg-green-700 transition shadow">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Nueva Reserva
+                    </Link>
+                    <Link :href="route('reservations.user.index')"
+                        class="flex items-center gap-3 bg-white text-tennis-green font-semibold px-6 py-4 rounded-xl hover:bg-gray-50 transition shadow border border-tennis-green">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Ver Mis Reservas
+                    </Link>
+                </div>
 
                 <!-- Tarjetas de resumen -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -284,24 +302,7 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                     </div>
                 </template>
 
-                <!-- Accesos rápidos -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link :href="route('reservations.create')"
-                        class="flex items-center gap-3 bg-tennis-green text-white font-semibold px-6 py-4 rounded-xl hover:bg-green-700 transition shadow">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Nueva Reserva
-                    </Link>
-                    <Link :href="route('reservations.user.index')"
-                        class="flex items-center gap-3 bg-white text-tennis-green font-semibold px-6 py-4 rounded-xl hover:bg-gray-50 transition shadow border border-tennis-green">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Ver Mis Reservas
-                    </Link>
-                </div>
+              
 
             </div>
         </div>
