@@ -44,6 +44,9 @@ Route::middleware([
 
         // Reservations management
         Route::get('/admin/reservations', [ReservationController::class, 'indexWeb'])->name('reservations.admin.index');
+        Route::get('/admin/reservations/{reservation}/edit', [ReservationController::class, 'editWeb'])->name('reservations.admin.edit');
+        Route::put('/admin/reservations/{reservation}', [ReservationController::class, 'updateWeb'])->name('reservations.admin.update');
+        Route::delete('/admin/reservations/{reservation}', [ReservationController::class, 'destroyWeb'])->name('reservations.admin.destroy');
 
         // Availabilities management
         Route::get('/admin/availabilities', [AvailabilityController::class, 'indexWeb'])->name('admin.availabilities.index');
@@ -58,6 +61,9 @@ Route::middleware([
     Route::get('reservations', [ReservationController::class, 'userReservationsWeb'])->name('reservations.user.index');
     Route::get('/reservations/create', [ReservationController::class, 'createWeb'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'storeWeb'])->name('reservations.store');
+    Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'editWeb'])->name('reservations.edit');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'updateWeb'])->name('reservations.update');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/spaces/{space}/available-time-blocks', [ReservationController::class, 'getAvailableTimeBlocksWeb'])->name('spaces.available-time-blocks');
     Route::get('/spaces/{space}', [SpaceController::class, 'showWeb'])->name('spaces.show');
 });

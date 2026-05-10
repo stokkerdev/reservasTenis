@@ -39,18 +39,25 @@
                                             {{ getStatusLabel(reservation.status) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <div class="flex gap-2">
-                                            <button
-                                                v-if="['pendiente', 'confirmada'].includes(reservation.status)"
-                                                @click="cancelReservation(reservation.id)"
-                                                class="text-red-600 hover:text-red-900 font-semibold"
-                                            >
-                                                Cancelar
-                                            </button>
-                                            <span v-else class="text-gray-400">-</span>
-                                        </div>
-                                    </td>
+                                      <td class="px-6 py-4 text-sm">
+                                          <div class="flex gap-2">
+                                              <Link
+                                                  v-if="['pending', 'confirmed'].includes(reservation.status)"
+                                                  :href="`/reservations/${reservation.id}/edit`"
+                                                  class="text-blue-600 hover:text-blue-900 font-semibold"
+                                              >
+                                                  Editar
+                                              </Link>
+                                              <button
+                                                  v-if="['pending', 'confirmed'].includes(reservation.status)"
+                                                  @click="deleteReservation(reservation.id)"
+                                                  class="text-red-600 hover:text-red-900 font-semibold"
+                                              >
+                                                  Eliminar
+                                              </button>
+                                              <span v-else class="text-gray-400">-</span>
+                                          </div>
+                                      </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -79,20 +86,18 @@ const formatDateTime = (dateTime) => {
 const getStatusClass = (status) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
     const statusClasses = {
-        pendiente: 'bg-yellow-100 text-yellow-800',
-        confirmada: 'bg-green-100 text-green-800',
-        rechazada: 'bg-red-100 text-red-800',
-        cancelada: 'bg-gray-100 text-gray-800',
+        pending: 'bg-yellow-100 text-yellow-800',
+        confirmed: 'bg-green-100 text-green-800',
+        cancelled: 'bg-gray-100 text-gray-800',
     };
     return `${baseClass} ${statusClasses[status] || ''}`;
 };
 
 const getStatusLabel = (status) => {
     const labels = {
-        pendiente: 'Pendiente',
-        confirmada: 'Confirmada',
-        rechazada: 'Rechazada',
-        cancelada: 'Cancelada',
+        pending: 'Pendiente',
+        confirmed: 'Confirmada',
+        cancelled: 'Cancelada',
     };
     return labels[status] || status;
 };
@@ -102,6 +107,22 @@ const cancelReservation = async (reservationId) => {
         try {
             await fetch(`/api/reservations/${reservationId}/cancel`, {
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                },
+            });
+            window.location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+};
+
+const deleteReservation = async (reservationId) => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer.')) {
+        try {
+            await fetch(`/api/reservations/${reservationId}`, {
+                method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
                 },

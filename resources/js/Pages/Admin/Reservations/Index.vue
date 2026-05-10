@@ -105,20 +105,18 @@ const formatDateTime = (dateTime) => {
 const getStatusClass = (status) => {
     const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
     const statusClasses = {
-        pendiente: 'bg-yellow-100 text-yellow-800',
-        confirmada: 'bg-green-100 text-green-800',
-        rechazada: 'bg-red-100 text-red-800',
-        cancelada: 'bg-gray-100 text-gray-800',
+        pending: 'bg-yellow-100 text-yellow-800',
+        confirmed: 'bg-green-100 text-green-800',
+        canceled: 'bg-gray-100 text-gray-800',
     };
     return `${baseClass} ${statusClasses[status] || ''}`;
 };
 
 const getStatusLabel = (status) => {
     const labels = {
-        pendiente: 'Pendiente',
-        confirmada: 'Confirmada',
-        rechazada: 'Rechazada',
-        cancelada: 'Cancelada',
+        pending: 'Pendiente',
+        confirmed: 'Confirmada',
+        cancelled: 'Cancelada',
     };
     return labels[status] || status;
 };

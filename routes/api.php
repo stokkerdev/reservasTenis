@@ -31,13 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Shared routes (Admin and User)
-    Route::get('spaces', [SpaceController::class, 'index']);
-    Route::get('spaces/{space}', [SpaceController::class, 'show']);
-    
     Route::get('reservations', [ReservationController::class, 'index']);
     Route::post('reservations', [ReservationController::class, 'store']);
     Route::get('reservations/{reservation}', [ReservationController::class, 'show']);
     Route::post('reservations/{id}/cancel', [ReservationController::class, 'cancel']);
+    Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
 
     // New route to get available time blocks for a space and date
     Route::get('spaces/{space}/available-time-blocks', [ReservationController::class, 'getAvailableTimeBlocks']);

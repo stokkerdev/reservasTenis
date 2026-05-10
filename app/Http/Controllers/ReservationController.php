@@ -29,7 +29,7 @@ class ReservationController extends Controller
         $reservations = Reservation::with('space', 'user')
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         return Inertia::render('Admin/Reservations/Index', [
             'reservations' => $reservations,
         ]);
@@ -44,7 +44,7 @@ class ReservationController extends Controller
             ->with('space')
             ->orderBy('start_time', 'desc')
             ->get();
-        
+
         return Inertia::render('Reservations/Index', [
             'reservations' => $reservations,
         ]);
@@ -56,7 +56,7 @@ class ReservationController extends Controller
     public function createWeb()
     {
         $spaces = Space::where('is_active', true)->get();
-        
+
         return Inertia::render('Reservations/Create', [
             'spaces' => $spaces,
         ]);
@@ -78,7 +78,7 @@ class ReservationController extends Controller
 
         $data['status'] = 'confirmed';
         $reservation = Reservation::create($data);
-        
+
         return response()->json(['message' => 'Reserva creada correctamente.', 'reservation' => $reservation->load('space')], 201);
     }
 
@@ -130,14 +130,53 @@ class ReservationController extends Controller
         return response()->json($reservation->load('space'));
     }
 
-    /**
-     * Remove the specified resource (API).
-     */
+
+
+    public function editWeb(string $id)
+    {
+        $reservation = Reservation::with('space')->findOrFail($id);
+        $spaces = Space::where('is_active', true)->get();
+
+        if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return redirect()->route('reservations')->with('error', 'No tienes permiso para editar esta reserva.');
+        }
+
+        return Inertia::render('Reservations/Edit', [
+            'reservation' => $reservation,
+            'spaces' => $spaces,
+        ]);
+    }
+
+   
+    
     public function destroy(string $id)
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->delete();
         return response()->json(['message' => 'Reserva eliminada correctamente']);
+    }
+
+    public function updateWeb(ReservationRequest $request, string $id)
+    {
+        $reservation = Reservation::findOrFail($id);
+
+        // Aqui reviso si puede editar, si el usuario es duiaño de su porpia reserva, si la puede editar o si es admin
+        if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            return redirect()->route('reservations')->with('error', 'No tienes permiso para editar esta reserva.');
+        }
+
+        $data = $request->validated();
+
+        // Check for conflicts, excluding the current reservation
+        if (Reservation::hasConflict($data['space_id'], $data['start_time'], $data['end_time'], $reservation->id)) {
+            return redirect()->back()->withInput()->withErrors([
+                'general' => 'Conflicto de horario. La cancha ya está reservada o bloqueada en ese período.'
+            ]);
+        }
+
+        $reservation->update($data);
+
+        return redirect()->route('reservations')->with('success', 'Reserva actualizada correctamente.');
     }
 
     /**
@@ -147,9 +186,9 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'confirmada']);
-        
+
         // TODO: Enviar correo de confirmación
-        
+
         return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
     }
 
@@ -160,9 +199,9 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'rechazada']);
-        
+
         // TODO: Enviar correo de rechazo
-        
+
         return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
     }
 
@@ -172,15 +211,15 @@ class ReservationController extends Controller
     public function cancel($id)
     {
         $reservation = Reservation::findOrFail($id);
-        
+
         if (!in_array($reservation->status, ['pendiente', 'confirmada'])) {
             return response()->json(['message' => 'No se puede cancelar una reserva en estado ' . $reservation->status], 422);
         }
 
         $reservation->update(['status' => 'cancelada']);
-        
+
         // TODO: Enviar correo de cancelación
-        
+
         return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
     }
 
