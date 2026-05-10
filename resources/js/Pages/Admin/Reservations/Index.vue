@@ -19,7 +19,6 @@
                                     <option value="">Todos los estados</option>
                                     <option value="pending">Pendiente</option>
                                     <option value="confirmed">Confirmada</option>
-                                    <option value="rejected">Rechazada</option>
                                     <option value="cancelled">Cancelada</option>
                                 </select>
                             </div>
@@ -69,14 +68,6 @@
                                                 title="Pendiente"
                                             >
                                                 Pendiente
-                                            </button>
-                                            <button
-                                                v-if="reservation.status !== 'rejected'"
-                                                @click="updateStatus(reservation.id, 'reject')"
-                                                class="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-bold"
-                                                title="Rechazar"
-                                            >
-                                                Rechazar
                                             </button>
                                             <button
                                                 v-if="reservation.status !== 'cancelled'"

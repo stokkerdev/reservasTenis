@@ -37,7 +37,7 @@
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ slot.reason }}</td>
                                     <td class="px-6 py-4 text-sm">
                                         <div class="flex gap-3">
-                                            <Link :href="`/admin/blocked-slots/${slot.id}/edit`" class="text-tennis-cyan hover:text-cyan-700 font-semibold">
+                                            <Link :href="`/admin/blocked-slots/${slot.id}/edit`" class="text-blue-700 hover:text-blue-900 font-semibold">
                                                 Editar
                                             </Link>
                                             <button @click="deleteBlockedSlot(slot.id)" class="text-red-600 hover:text-red-900 font-semibold">
