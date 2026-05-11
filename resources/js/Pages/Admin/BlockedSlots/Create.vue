@@ -152,7 +152,7 @@ const fetchAvailableBlocks = async () => {
     }
 
     try {
-        const response = await fetch(`/api/spaces/${form.space_id}/available-time-blocks?date=${selectedDate.value}`);
+        const response = await fetch(`/spaces/${form.space_id}/available-time-blocks?date=${selectedDate.value}`);
         if (!response.ok) {
             throw new Error('Failed to fetch available time blocks');
         }
@@ -178,7 +178,7 @@ const submitForm = async () => {
     }
 
     try {
-        const response = await fetch('/api/blocked-slots', {
+        const response = await fetch('/admin/blocked-slots', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

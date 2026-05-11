@@ -266,7 +266,7 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Canchas favoritas -->
                         <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
-                            <h4 class="text-base font-semibold text-gray-700 mb-4">Canchas Favoritas</h4>
+                            <h4 class="text-base font-semibold text-gray-700 mb-4">Canchas Reservadas</h4>
                             <div v-if="stats.favoriteCourts.length > 0" class="h-56">
                                 <Bar :data="favoriteCourtsData" :options="barOptions" />
                             </div>
