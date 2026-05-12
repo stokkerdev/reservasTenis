@@ -14,7 +14,7 @@ const loading = ref(false);
 const fetchBlocks = async () => {
     loading.value = true;
     try {
-        const response = await fetch(`/api/spaces/${props.space.id}/available-time-blocks?date=${selectedDate.value}`);
+        const response = await fetch(`/spaces/${props.space.id}/available-time-blocks?date=${selectedDate.value}`);
         if (response.ok) {
             availableBlocks.value = await response.json();
         }
