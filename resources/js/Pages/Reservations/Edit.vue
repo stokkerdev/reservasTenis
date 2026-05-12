@@ -161,7 +161,7 @@ const fetchAvailableBlocks = async () => {
 };
 
 const formatTime = (dateTime) => {
-    return new Date(dateTime).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return new Date(dateTime).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 };
 
 const submitForm = async () => {

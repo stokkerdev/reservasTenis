@@ -173,7 +173,7 @@ const formatTime = (dateTime) => {
 const submitForm = async () => {
     errors.value = {}; // Clear previous errors
     if (!selectedBlock.value) {
-        errors.value.block = 'Por favor, selecciona un bloque horario.';
+        errors.value.block = 'Por favor, selecciona un bloque horario que va a generar el bloqueo.';
         return;
     }
 
