@@ -386,7 +386,7 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                                         <p class="text-2xl font-black text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
                                     </div>
                                     <Link 
-                                        :href="route('spaces.show', space.slug)" 
+                                        :href="route('spaces.show', { space: space.slug })" 
                                         class="bg-tennis-cyan text-tennis-green font-black px-6 py-3 rounded-2xl hover:bg-cyan-200 hover:shadow-lg transition duration-300 transform active:scale-95"
                                     >
                                         Ver Detalles

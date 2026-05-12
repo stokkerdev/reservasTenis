@@ -131,7 +131,7 @@ const getSpaceImage = (path) => {
                                 <p class="text-xl font-extrabold text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
                             </div>
                             <Link 
-                                :href="`/spaces/${space.slug}`" 
+                                :href="route('spaces.show', { space: space.slug })" 
                                 class="bg-tennis-cyan text-tennis-green font-bold px-4 py-2 rounded-lg hover:bg-cyan-200 transition"
                             >
                                 Ver Detalles
