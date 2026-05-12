@@ -85,6 +85,9 @@ class StatisticsController extends Controller
                 'total'  => (int) $r->total,
             ]);
 
+        // Obtener todas las canchas activas para mostrar en el dashboard
+        $spaces = Space::where('is_active', true)->get();
+
         return Inertia::render('Dashboard', [
             'stats' => [
                 'totalReservations' => $totalReservations,
@@ -94,6 +97,7 @@ class StatisticsController extends Controller
                 'reservationsByMonth' => $reservationsByMonth,
                 'statusBreakdown'   => $statusBreakdown,
             ],
+            'spaces' => $spaces,
         ]);
     }
 
