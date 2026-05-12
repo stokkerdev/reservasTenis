@@ -187,10 +187,10 @@ const hasData = computed(() => props.stats.totalReservations > 0);
 </script>
 
 <template>
-    <AppLayout title="Mi Dashboard">
+    <AppLayout title="Mis Estadísticas">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Mi Dashboard
+                Mis Estadísticas
             </h2>
         </template>
 
@@ -200,11 +200,11 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                 <!-- Bienvenida -->
                 <div class="bg-gradient-to-r from-tennis-green to-green-700 rounded-2xl p-6 text-white shadow-lg">
                     <h3 class="text-2xl font-bold mb-1">¡Hola, {{ user.name }}!</h3>
-                    <p class="text-green-100">Bienvenido a tu dashboard. Reserva una cancha o consulta tus estadísticas.</p>
+                    <p class="text-green-100">Aquí tienes un resumen de tu actividad en las canchas.</p>
                 </div>
 
                 <!-- Accesos rápidos -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Link :href="route('reservations.create')"
                         class="flex items-center gap-3 bg-tennis-green text-white font-semibold px-6 py-4 rounded-xl hover:bg-green-700 transition shadow">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,8 +220,12 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                         </svg>
                         Ver Mis Reservas
                     </Link>
+                </div>
+
+                <!-- Botón Mira tus estadísticas -->
+                <div class="flex justify-center">
                     <button @click="showStats = !showStats"
-                        class="flex items-center gap-3 bg-tennis-cyan text-tennis-green font-semibold px-6 py-4 rounded-xl hover:bg-cyan-200 transition shadow">
+                        class="flex items-center gap-3 bg-tennis-cyan text-tennis-green font-bold px-8 py-3 rounded-full hover:bg-cyan-200 transition shadow-md border-2 border-tennis-green/20">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -230,160 +234,160 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                     </button>
                 </div>
 
-                <!-- Tarjetas de resumen (solo si hay datos) -->
-                <template v-if="hasData">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Total reservas -->
-                        <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 border border-gray-100">
-                            <div class="bg-tennis-green/10 rounded-full p-4">
-                                <svg class="w-8 h-8 text-tennis-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                <!-- Estadísticas (Colapsables) -->
+                <transition
+                    enter-active-class="transition ease-out duration-300"
+                    enter-from-class="transform opacity-0 scale-95"
+                    enter-to-class="transform opacity-100 scale-100"
+                    leave-active-class="transition ease-in duration-200"
+                    leave-from-class="transform opacity-100 scale-100"
+                    leave-to-class="transform opacity-0 scale-95"
+                >
+                    <div v-if="showStats" class="space-y-8">
+                        <!-- Tarjetas de resumen -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Total reservas -->
+                            <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 border border-gray-100">
+                                <div class="bg-tennis-green/10 rounded-full p-4">
+                                    <svg class="w-8 h-8 text-tennis-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 font-medium">Total de Reservas</p>
+                                    <p class="text-3xl font-bold text-gray-800">{{ stats.totalReservations }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Total de Reservas</p>
-                                <p class="text-3xl font-bold text-gray-800">{{ stats.totalReservations }}</p>
+
+                            <!-- Horas jugadas -->
+                            <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 border border-gray-100">
+                                <div class="bg-tennis-cyan/10 rounded-full p-4">
+                                    <svg class="w-8 h-8 text-tennis-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 font-medium">Horas Jugadas</p>
+                                    <p class="text-3xl font-bold text-gray-800">{{ stats.hoursPlayed }}<span class="text-lg font-normal text-gray-400"> h</span></p>
+                                </div>
+                            </div>
+
+                            <!-- Cancha favorita -->
+                            <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 border border-gray-100">
+                                <div class="bg-yellow-100 rounded-full p-4">
+                                    <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500 font-medium">Cancha Favorita</p>
+                                    <p class="text-lg font-bold text-gray-800 truncate max-w-[160px]">
+                                        {{ stats.favoriteCourts.length > 0 ? stats.favoriteCourts[0].name : 'Sin datos' }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Horas jugadas -->
-                        <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 border border-gray-100">
-                            <div class="bg-tennis-cyan/10 rounded-full p-4">
-                                <svg class="w-8 h-8 text-tennis-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                        <!-- Gráficos -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
+                                <h4 class="text-base font-semibold text-gray-700 mb-4">Canchas Reservadas</h4>
+                                <div v-if="stats.favoriteCourts.length > 0" class="h-56">
+                                    <Bar :data="favoriteCourtsData" :options="barOptions" />
+                                </div>
+                                <p v-else class="text-gray-400 text-sm text-center py-10">Sin datos disponibles</p>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Horas Jugadas</p>
-                                <p class="text-3xl font-bold text-gray-800">{{ stats.hoursPlayed }}<span class="text-lg font-normal text-gray-400"> h</span></p>
+
+                            <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
+                                <h4 class="text-base font-semibold text-gray-700 mb-4">Estado de mis Reservas</h4>
+                                <div v-if="stats.statusBreakdown.length > 0" class="h-56">
+                                    <Doughnut :data="statusBreakdownData" :options="doughnutOptions" />
+                                </div>
+                                <p v-else class="text-gray-400 text-sm text-center py-10">Sin datos disponibles</p>
                             </div>
                         </div>
 
-                        <!-- Cancha favorita -->
-                        <div class="bg-white rounded-2xl shadow p-6 flex items-center gap-4 border border-gray-100">
-                            <div class="bg-yellow-100 rounded-full p-4">
-                                <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-medium">Cancha Favorita</p>
-                                <p class="text-lg font-bold text-gray-800 truncate max-w-[160px]">
-                                    {{ stats.favoriteCourts.length > 0 ? stats.favoriteCourts[0].name : 'Sin datos' }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
-                <!-- Estadísticas (colapsables) -->
-                <template v-if="hasData && showStats">
-                    <!-- Fila 1: Canchas favoritas + Estado de reservas -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Canchas favoritas -->
                         <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
-                            <h4 class="text-base font-semibold text-gray-700 mb-4">Mis Canchas Favoritas</h4>
-                            <div v-if="stats.favoriteCourts.length > 0" class="h-56">
-                                <Bar :data="favoriteCourtsData" :options="barOptions" />
+                            <h4 class="text-base font-semibold text-gray-700 mb-4">Horarios Preferidos</h4>
+                            <div v-if="stats.preferredHours.length > 0" class="h-56">
+                                <Bar :data="preferredHoursData" :options="hoursBarOptions" />
                             </div>
                             <p v-else class="text-gray-400 text-sm text-center py-10">Sin datos disponibles</p>
                         </div>
 
-                        <!-- Estado de reservas -->
                         <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
-                            <h4 class="text-base font-semibold text-gray-700 mb-4">Estado de mis Reservas</h4>
-                            <div v-if="stats.statusBreakdown.length > 0" class="h-56">
-                                <Doughnut :data="statusBreakdownData" :options="doughnutOptions" />
+                            <h4 class="text-base font-semibold text-gray-700 mb-4">Actividad Mensual (últimos 6 meses)</h4>
+                            <div v-if="stats.reservationsByMonth.length > 0" class="h-56">
+                                <Line :data="reservationsByMonthData" :options="lineOptions" />
                             </div>
                             <p v-else class="text-gray-400 text-sm text-center py-10">Sin datos disponibles</p>
                         </div>
                     </div>
+                </transition>
 
-                    <!-- Fila 2: Horarios preferidos -->
-                    <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
-                        <h4 class="text-base font-semibold text-gray-700 mb-4">Horarios Preferidos</h4>
-                        <div v-if="stats.preferredHours.length > 0" class="h-56">
-                            <Bar :data="preferredHoursData" :options="hoursBarOptions" />
-                        </div>
-                        <p v-else class="text-gray-400 text-sm text-center py-10">Sin datos disponibles</p>
-                    </div>
-
-                    <!-- Fila 3: Actividad mensual -->
-                    <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
-                        <h4 class="text-base font-semibold text-gray-700 mb-4">Actividad Mensual (últimos 6 meses)</h4>
-                        <div v-if="stats.reservationsByMonth.length > 0" class="h-56">
-                            <Line :data="reservationsByMonthData" :options="lineOptions" />
-                        </div>
-                        <p v-else class="text-gray-400 text-sm text-center py-10">Sin datos disponibles</p>
-                    </div>
-                </template>
-
-                <!-- Sección de Canchas Disponibles -->
-                <div class="border-t pt-8">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Canchas Disponibles</h3>
-
+                <!-- Sección de Canchas Disponibles (Presentación Bonita) -->
+                <div class="space-y-6">
+                    <h3 class="text-3xl font-extrabold text-gray-900 text-center">Nuestras Canchas</h3>
+                    
                     <!-- Filtros -->
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-                        <div class="flex gap-2">
-                            <button 
-                                @click="filterType = ''"
-                                :class="filterType === '' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                                class="px-6 py-2 rounded-full font-semibold transition shadow-sm hover:shadow-md"
-                            >
-                                Todas
-                            </button>
-                            <button 
-                                @click="filterType = 'cesped'"
-                                :class="filterType === 'cesped' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                                class="px-6 py-2 rounded-full font-semibold transition shadow-sm hover:shadow-md"
-                            >
-                                Césped
-                            </button>
-                            <button 
-                                @click="filterType = 'arcilla'"
-                                :class="filterType === 'arcilla' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                                class="px-6 py-2 rounded-full font-semibold transition shadow-sm hover:shadow-md"
-                            >
-                                Arcilla
-                            </button>
-                            <button 
-                                @click="filterType = 'cemento'"
-                                :class="filterType === 'cemento' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                                class="px-6 py-2 rounded-full font-semibold transition shadow-sm hover:shadow-md"
-                            >
-                                Cemento
-                            </button>
-                        </div>
-                        <p class="text-gray-500 font-medium">{{ filteredSpaces.length }} canchas disponibles</p>
+                    <div class="flex flex-wrap items-center justify-center gap-3">
+                        <button 
+                            @click="filterType = ''"
+                            :class="filterType === '' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Todas
+                        </button>
+                        <button 
+                            @click="filterType = 'cesped'"
+                            :class="filterType === 'cesped' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Césped
+                        </button>
+                        <button 
+                            @click="filterType = 'arcilla'"
+                            :class="filterType === 'arcilla' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Arcilla
+                        </button>
+                        <button 
+                            @click="filterType = 'cemento'"
+                            :class="filterType === 'cemento' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Cemento
+                        </button>
                     </div>
 
                     <!-- Grid de Canchas -->
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div v-for="space in filteredSpaces" :key="space.id" class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 flex flex-col border border-gray-100">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+                        <div v-for="space in filteredSpaces" :key="space.id" class="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 flex flex-col group border border-gray-100">
                             <!-- Imagen -->
-                            <div class="relative h-56 overflow-hidden">
-                                <img :src="getSpaceImage(space.image_path)" :alt="space.name" class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
-                                <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-tennis-green font-bold text-sm shadow-sm">
-                                    {{ space.type.toUpperCase() }}
+                            <div class="relative h-64 overflow-hidden">
+                                <img :src="getSpaceImage(space.image_path)" :alt="space.name" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                                <div class="absolute top-5 right-5 bg-white/95 backdrop-blur px-4 py-1.5 rounded-2xl text-tennis-green font-black text-xs shadow-lg uppercase tracking-widest">
+                                    {{ space.type }}
                                 </div>
                             </div>
 
                             <!-- Contenido -->
-                            <div class="p-6 flex-1 flex flex-col">
-                                <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ space.name }}</h3>
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ space.description || 'Sin descripción disponible.' }}</p>
+                            <div class="p-8 flex-1 flex flex-col">
+                                <h3 class="text-2xl font-black text-gray-900 mb-3 group-hover:text-tennis-green transition duration-300">{{ space.name }}</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-3">{{ space.description || 'Disfruta de una experiencia profesional en nuestras instalaciones de primer nivel.' }}</p>
                                 
-                                <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                                <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                                     <div>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Precio por hora</p>
-                                        <p class="text-xl font-extrabold text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
+                                        <p class="text-[10px] text-gray-400 uppercase font-black tracking-[0.2em] mb-1">Precio / Hora</p>
+                                        <p class="text-2xl font-black text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
                                     </div>
                                     <Link 
-                                        :href="`/spaces/${space.slug}`" 
-                                        class="bg-tennis-cyan text-tennis-green font-bold px-4 py-2 rounded-lg hover:bg-cyan-200 transition"
+                                        :href="route('spaces.show', space.slug)" 
+                                        class="bg-tennis-cyan text-tennis-green font-black px-6 py-3 rounded-2xl hover:bg-cyan-200 hover:shadow-lg transition duration-300 transform active:scale-95"
                                     >
                                         Ver Detalles
                                     </Link>
@@ -393,14 +397,14 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                     </div>
 
                     <!-- Empty State -->
-                    <div v-if="filteredSpaces.length === 0" class="text-center py-20">
-                        <div class="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <div v-if="filteredSpaces.length === 0" class="text-center py-24 bg-white rounded-3xl shadow-inner border border-dashed border-gray-200">
+                        <div class="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900">No se encontraron canchas</h3>
-                        <p class="text-gray-500">Intenta con otro filtro o vuelve más tarde.</p>
+                        <h3 class="text-2xl font-black text-gray-900 mb-2">Sin canchas disponibles</h3>
+                        <p class="text-gray-500 font-medium">No encontramos canchas de tipo "{{ filterType }}" en este momento.</p>
                     </div>
                 </div>
 
@@ -408,3 +412,12 @@ const hasData = computed(() => props.stats.totalReservations > 0);
         </div>
     </AppLayout>
 </template>
+
+<style scoped>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
