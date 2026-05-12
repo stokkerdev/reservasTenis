@@ -1,42 +1,41 @@
 <script setup>
-import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 
-const props = defineProps({
-    canLogin: Boolean,
-    canRegister: Boolean,
-    spaces: Array,
+defineProps({
+    canLogin: {
+        type: Boolean,
+    },
+    canRegister: {
+        type: Boolean,
+    },
 });
-
-const filterType = ref('');
-
-const filteredSpaces = computed(() => {
-    if (!filterType.value) return props.spaces;
-    return props.spaces.filter(s => s.type === filterType.value);
-});
-
-const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(price);
-};
-
-const getSpaceImage = (path) => {
-    return path ? `/storage/${path}` : '/images/default-court.jpg';
-};
 </script>
 
 <template>
     <Head title="Bienvenidos al Club de Tenis" />
     
-    <div class="relative min-h-screen bg-gray-50 overflow-hidden">
+    <div class="relative min-h-screen bg-tennis-white overflow-hidden">
+        <!-- Fondo decorativo con temática de tenis -->
+        <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <rect x="0" y="0" width="100" height="100" fill="#2e5a27" />
+                <line x1="0" y1="50" x2="100" y2="50" stroke="white" stroke-width="0.5" />
+                <line x1="50" y1="0" x2="50" y2="100" stroke="white" stroke-width="0.5" />
+                <rect x="10" y="10" width="80" height="80" fill="none" stroke="white" stroke-width="0.5" />
+            </svg>
+        </div>
+
         <!-- Navegación superior -->
-        <nav class="relative z-10 flex items-center justify-between p-6 lg:px-8 bg-white border-b border-gray-100 shadow-sm">
+        <nav class="relative z-10 flex items-center justify-between p-6 lg:px-8 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
             <div class="flex items-center gap-3">
                 <ApplicationLogo class="h-10 w-auto" />
                 <span class="text-tennis-green font-bold text-xl tracking-tight">CLUB DE TENIS</span>
             </div>
             
             <div v-if="canLogin" class="flex gap-4">
+
+                
                 <Link
                     v-if="$page.props.auth.user"
                     :href="route('dashboard')"
@@ -56,7 +55,7 @@ const getSpaceImage = (path) => {
                     <Link
                         v-if="canRegister"
                         :href="route('register')"
-                        class="px-4 py-2 bg-tennis-green text-white font-bold rounded-lg shadow-md hover:bg-green-800 transition"
+                        class="px-4 py-2 bg-tennis-green text-white font-bold rounded-lg shadow-md hover:bg-green-800 transition transform hover:-translate-y-0.5"
                     >
                         Registrarse
                     </Link>
@@ -64,97 +63,55 @@ const getSpaceImage = (path) => {
             </div>
         </nav>
 
-        <!-- Hero Section -->
-        <header class="bg-tennis-green py-16 px-6 text-center text-white">
-            <h1 class="text-4xl md:text-6xl font-extrabold mb-4">Nuestras Canchas</h1>
-            <p class="text-xl opacity-90 max-w-2xl mx-auto">
-                Reserva en las mejores instalaciones profesionales. Césped, arcilla o cemento, tú eliges.
-            </p>
-        </header>
-
-        <!-- Filtros y Listado -->
-        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-            <!-- Filtros -->
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-12">
-                <div class="flex gap-2">
-                    <button 
-                        @click="filterType = ''"
-                        :class="filterType === '' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                        class="px-6 py-2 rounded-full font-semibold transition shadow-sm"
-                    >
-                        Todas
-                    </button>
-                    <button 
-                        @click="filterType = 'cesped'"
-                        :class="filterType === 'cesped' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                        class="px-6 py-2 rounded-full font-semibold transition shadow-sm"
-                    >
-                        Césped
-                    </button>
-                    <button 
-                        @click="filterType = 'arcilla'"
-                        :class="filterType === 'arcilla' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                        class="px-6 py-2 rounded-full font-semibold transition shadow-sm"
-                    >
-                        Arcilla
-                    </button>
-                    <button 
-                        @click="filterType = 'cemento'"
-                        :class="filterType === 'cemento' ? 'bg-tennis-green text-white' : 'bg-white text-gray-700 border border-gray-200'"
-                        class="px-6 py-2 rounded-full font-semibold transition shadow-sm"
-                    >
-                        Cemento
-                    </button>
-                </div>
-                <p class="text-gray-500 font-medium">{{ filteredSpaces.length }} canchas disponibles</p>
-            </div>
-
-            <!-- Grid de Canchas -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div v-for="space in filteredSpaces" :key="space.id" class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 flex flex-col">
-                    <!-- Imagen -->
-                    <div class="relative h-56 overflow-hidden">
-                        <img :src="getSpaceImage(space.image_path)" :alt="space.name" class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
-                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-tennis-green font-bold text-sm shadow-sm">
-                            {{ space.type.toUpperCase() }}
-                        </div>
+        <!-- Contenido Principal -->
+        <main class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-20 pb-32">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="inline-block px-4 py-1.5 mb-6 text-sm font-bold tracking-wider text-tennis-green uppercase bg-tennis-cyan/30 rounded-full">
+                        El Deporte Blanco te Espera
+                    </span>
+                    <h1 class="text-5xl lg:text-7xl font-extrabold text-gray-900 leading-tight mb-6">
+                        Reserva tu cancha y <span class="text-tennis-green">domina el juego</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-10 leading-relaxed">
+                        La plataforma más avanzada para gestionar tus partidas de tenis. Reserva en segundos, encuentra compañeros de juego y mejora tu nivel en nuestras canchas de clase mundial.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <Link :href="route('register')" class="px-8 py-4 bg-tennis-green text-white text-lg font-bold rounded-xl shadow-xl hover:bg-green-800 transition transform hover:scale-105">
+                            Comenzar Ahora
+                        </Link>
+                        <a href="#features" class="px-8 py-4 bg-white text-gray-800 text-lg font-bold rounded-xl border border-gray-200 shadow-sm hover:bg-gray-50 transition">
+                            Saber Más
+                        </a>
                     </div>
+                </div>
 
-                    <!-- Contenido -->
-                    <div class="p-6 flex-1 flex flex-col">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ space.name }}</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ space.description || 'Sin descripción disponible.' }}</p>
-                        
-                        <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                            <div>
-                                <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Precio por hora</p>
-                                <p class="text-xl font-extrabold text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
+                <div class="relative">
+                    <!-- Imagen decorativa / Ilustración -->
+                    <div class="bg-tennis-green rounded-3xl p-4 shadow-2xl rotate-3 transform hover:rotate-0 transition duration-500">
+                        <div class="bg-white rounded-2xl p-8 aspect-square flex flex-col items-center justify-center text-center">
+                            <ApplicationLogo class="w-32 h-32 mb-6" />
+                            <h3 class="text-2xl font-bold text-tennis-green mb-2">Canchas Profesionales</h3>
+                            <p class="text-gray-500">Césped, Arcilla y Cemento</p>
+                            <div class="mt-8 flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-tennis-yellow"></div>
+                                <div class="w-3 h-3 rounded-full bg-tennis-yellow/50"></div>
+                                <div class="w-3 h-3 rounded-full bg-tennis-yellow/20"></div>
                             </div>
-                            <Link 
-                                :href="route('spaces.show', { space: space.slug })" 
-                                class="bg-tennis-cyan text-tennis-green font-bold px-4 py-2 rounded-lg hover:bg-cyan-200 transition"
-                            >
-                                Ver Detalles
-                            </Link>
                         </div>
                     </div>
+                    <!-- Badge flotante -->
+                    <div class="absolute -bottom-6 -left-6 bg-tennis-cyan p-6 rounded-2xl shadow-xl border-4 border-white">
+                        <p class="text-tennis-green font-bold text-3xl">100%</p>
+                        <p class="text-gray-700 font-medium">Disponibilidad</p>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Empty State -->
-            <div v-if="filteredSpaces.length === 0" class="text-center py-20">
-                <div class="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900">No se encontraron canchas</h3>
-                <p class="text-gray-500">Intenta con otro filtro o vuelve más tarde.</p>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="py-12 border-t border-gray-100 bg-white mt-20">
+        <footer class="relative z-10 py-12 border-t border-gray-100 bg-white">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex items-center gap-2">
                     <ApplicationLogo class="h-6 w-auto" />
