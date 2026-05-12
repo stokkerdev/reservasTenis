@@ -87,7 +87,14 @@ class SpaceController extends Controller
      */
     public function storeWeb(SpaceRequest $request)
     {
-        $space = Space::create($request->validated());
+        $data = $request->validated();
+        
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('spaces', 'public');
+            $data['image_path'] = $path;
+        }
+
+        $space = Space::create($data);
         return redirect()->route('admin.spaces.index')->with('success', 'Cancha creada correctamente');
     }
 
@@ -96,7 +103,19 @@ class SpaceController extends Controller
      */
     public function updateWeb(SpaceRequest $request, Space $space)
     {
-        $space->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            // Opcional: eliminar imagen anterior si existe
+            if ($space->image_path && \Storage::disk('public')->exists($space->image_path)) {
+                \Storage::disk('public')->delete($space->image_path);
+            }
+            
+            $path = $request->file('image')->store('spaces', 'public');
+            $data['image_path'] = $path;
+        }
+
+        $space->update($data);
         return redirect()->route('admin.spaces.index')->with('success', 'Cancha actualizada correctamente');
     }
 

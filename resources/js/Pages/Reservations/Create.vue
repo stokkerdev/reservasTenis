@@ -130,8 +130,13 @@ const props = defineProps({
     spaces: Array,
 });
 
+// Obtener parámetros de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const initialSpaceId = urlParams.get('space_id') || '';
+const initialDate = urlParams.get('date') || '';
+
 const form = reactive({
-    space_id: '',
+    space_id: initialSpaceId,
     start_time: '',
     end_time: '',
     notes: '',
@@ -139,7 +144,7 @@ const form = reactive({
 
 const errors = ref({});
 const selectedSpace = ref(null);
-const selectedDate = ref('');
+const selectedDate = ref(initialDate);
 const availableBlocks = ref([]);
 const selectedBlock = ref(null);
 
