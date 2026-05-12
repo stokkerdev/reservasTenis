@@ -1,67 +1,138 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+
+const props = defineProps({
+    space: Object,
+});
+
+const selectedDate = ref(new Date().toISOString().split('T')[0]);
+const availableBlocks = ref([]);
+const loading = ref(false);
+
+const fetchBlocks = async () => {
+    loading.value = true;
+    try {
+        const response = await fetch(`/api/spaces/${props.space.id}/available-time-blocks?date=${selectedDate.value}`);
+        if (response.ok) {
+            availableBlocks.value = await response.json();
+        }
+    } catch (error) {
+        console.error('Error fetching blocks:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchBlocks();
+});
+
+const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(price);
+};
+
+const formatTime = (time) => {
+    return new Date(time).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+};
+
+const getSpaceImage = (path) => {
+    return path ? `/storage/${path}` : '/images/default-court.jpg';
+};
+</script>
+
 <template>
-    <AppLayout>
+    <AppLayout :title="space.name">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ space.name }}</h2>
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ space.name }}
+                </h2>
+                <Link href="/" class="text-tennis-green font-bold hover:underline">
+                    &larr; Volver al listado
+                </Link>
+            </div>
         </template>
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- Información de la cancha -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <!-- Detalles principales -->
-                    <div class="lg:col-span-2 bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 bg-white border-b border-gray-200">
-                            <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ space.name }}</h3>
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl">
+                    <div class="grid lg:grid-cols-2">
+                        <!-- Imagen y Detalles -->
+                        <div class="p-8 border-r border-gray-100">
+                            <div class="rounded-2xl overflow-hidden h-80 mb-6 shadow-md">
+                                <img :src="getSpaceImage(space.image_path)" :alt="space.name" class="w-full h-full object-cover">
+                            </div>
                             
-                            <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="flex items-center gap-4 mb-6">
+                                <span class="px-4 py-1 bg-tennis-cyan/30 text-tennis-green rounded-full font-bold text-sm uppercase tracking-wider">
+                                    {{ space.type }}
+                                </span>
+                                <span class="text-gray-400">|</span>
+                                <span class="text-gray-600 font-medium">Capacidad: {{ space.capacity }} personas</span>
+                            </div>
+
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">Descripción</h3>
+                            <p class="text-gray-600 leading-relaxed mb-8">
+                                {{ space.description || 'Esta cancha profesional cuenta con todas las medidas reglamentarias y mantenimiento diario para garantizar la mejor experiencia de juego.' }}
+                            </p>
+
+                            <div class="bg-gray-50 p-6 rounded-2xl flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm text-gray-600 mb-1"><strong>Tipo:</strong></p>
-                                    <p class="text-lg text-gray-900">{{ space.type }}</p>
+                                    <p class="text-sm text-gray-500 font-bold uppercase">Precio por hora</p>
+                                    <p class="text-3xl font-black text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
                                 </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 mb-1"><strong>Capacidad:</strong></p>
-                                    <p class="text-lg text-gray-900">{{ space.capacity }} personas</p>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500 font-bold uppercase">Ubicación</p>
+                                    <p class="text-lg font-bold text-gray-800">{{ space.location || 'Sede Principal' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Disponibilidad y Reserva -->
+                        <div class="p-8 bg-gray-50/50">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6">¡Reserva esta cancha!</h3>
+                            
+                            <div class="mb-8">
+                                <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Selecciona una fecha</label>
+                                <input 
+                                    v-model="selectedDate" 
+                                    type="date" 
+                                    @change="fetchBlocks"
+                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-tennis-cyan focus:border-tennis-cyan transition"
+                                >
+                            </div>
+
+                            <div class="mb-8">
+                                <h4 class="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wide">Horarios Disponibles</h4>
+                                
+                                <div v-if="loading" class="flex justify-center py-10">
+                                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-tennis-green"></div>
+                                </div>
+
+                                <div v-else-if="availableBlocks.length > 0" class="grid grid-cols-2 gap-3">
+                                    <div v-for="block in availableBlocks" :key="block.start_time" class="bg-white p-3 rounded-xl border border-gray-200 text-center shadow-sm">
+                                        <p class="text-sm font-bold text-gray-800">{{ formatTime(block.start_time) }} - {{ formatTime(block.end_time) }}</p>
+                                    </div>
+                                </div>
+
+                                <div v-else class="bg-yellow-50 border border-yellow-100 p-6 rounded-2xl text-center">
+                                    <p class="text-yellow-700 font-medium">No hay horarios disponibles para esta fecha.</p>
                                 </div>
                             </div>
 
-                            <div class="mb-6">
-                                <p class="text-sm text-gray-600 mb-2"><strong>Descripción:</strong></p>
-                                <p class="text-gray-700">{{ space.description }}</p>
+                            <div class="pt-6 border-t border-gray-200">
+                                <Link 
+                                    :href="route('reservations.create', { space_id: space.id, date: selectedDate })"
+                                    class="block w-full bg-tennis-green text-white text-center font-black py-4 rounded-2xl shadow-xl hover:bg-green-800 transition transform hover:-translate-y-1"
+                                >
+                                    CONTINUAR CON LA RESERVA
+                                </Link>
+                                <p class="text-center text-xs text-gray-400 mt-4">
+                                    Al hacer clic, serás redirigido para completar los detalles de tu reserva.
+                                </p>
                             </div>
-
-                            <div class="bg-tennis-green/10 border border-tennis-green rounded-lg p-4">
-                                <p class="text-3xl font-bold text-tennis-green">${{ space.price_per_hour }}/hora</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Botón de reserva -->
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 bg-white text-center">
-                            <h4 class="text-lg font-semibold text-gray-900 mb-4">¿Deseas reservar esta cancha?</h4>
-                            <Link href="/reservations/create" class="block w-full bg-tennis-green text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-700 transition mb-3">
-                                Hacer Reserva
-                            </Link>
-                            <Link href="/" class="block w-full bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg hover:bg-gray-400 transition">
-                                Volver
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Disponibilidad -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Horarios Disponibles</h3>
-                        
-                        <div v-if="space.availabilities && space.availabilities.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div v-for="availability in space.availabilities" :key="availability.id" class="border border-gray-200 rounded-lg p-4">
-                                <p class="text-sm text-gray-600 mb-2"><strong>{{ getDayName(availability.day_of_week) }}</strong></p>
-                                <p class="text-gray-900">{{ availability.start_time }} - {{ availability.end_time }}</p>
-                            </div>
-                        </div>
-                        <div v-else class="text-center text-gray-500 py-8">
-                            No hay horarios disponibles registrados
                         </div>
                     </div>
                 </div>
@@ -69,17 +140,3 @@
         </div>
     </AppLayout>
 </template>
-
-<script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
-
-defineProps({
-    space: Object,
-});
-
-const getDayName = (dayOfWeek) => {
-    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    return days[dayOfWeek] || dayOfWeek;
-};
-</script>

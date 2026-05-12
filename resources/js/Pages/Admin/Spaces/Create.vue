@@ -97,6 +97,19 @@
                                 <p v-if="form.errors.price_per_hour" class="text-red-600 text-sm mt-1">{{ form.errors.price_per_hour }}</p>
                             </div>
 
+                            <!-- Imagen -->
+                            <div>
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Imagen de la Cancha</label>
+                                <input
+                                    type="file"
+                                    id="image"
+                                    @input="form.image = $event.target.files[0]"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
+                                    accept="image/*"
+                                />
+                                <p v-if="form.errors.image" class="text-red-600 text-sm mt-1">{{ form.errors.image }}</p>
+                            </div>
+
                             <!-- Activa -->
                             <div class="flex items-center">
                                 <input
@@ -141,6 +154,7 @@ const form = useForm({
     description: '',
     price_per_hour: 0,
     is_active: true,
+    image: null,
 });
 
 const submitForm = () => {

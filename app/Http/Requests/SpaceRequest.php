@@ -36,6 +36,7 @@ class SpaceRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'price_per_hour' => ['required', 'numeric', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
     }
 }

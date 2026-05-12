@@ -91,6 +91,22 @@
                                 <p v-if="form.errors.price_per_hour" class="text-red-600 text-sm mt-1">{{ form.errors.price_per_hour }}</p>
                             </div>
 
+                            <!-- Imagen -->
+                            <div>
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Imagen de la Cancha</label>
+                                <div v-if="space.image_path" class="mb-2">
+                                    <img :src="`/storage/${space.image_path}`" alt="Imagen actual" class="w-32 h-32 object-cover rounded-lg border">
+                                </div>
+                                <input
+                                    type="file"
+                                    id="image"
+                                    @input="form.image = $event.target.files[0]"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
+                                    accept="image/*"
+                                />
+                                <p v-if="form.errors.image" class="text-red-600 text-sm mt-1">{{ form.errors.image }}</p>
+                            </div>
+
                             <!-- Activa -->
                             <div class="flex items-center">
                                 <input
@@ -132,6 +148,7 @@ const props = defineProps({
 });
 
 const form = useForm({
+    _method: 'PUT', // Necesario para enviar archivos con PUT en Laravel
     name: props.space.name,
     slug: props.space.slug,
     type: props.space.type,
@@ -139,9 +156,11 @@ const form = useForm({
     description: props.space.description,
     price_per_hour: props.space.price_per_hour,
     is_active: props.space.is_active,
+    image: null,
 });
 
 const submitForm = () => {
-    form.put(`/admin/spaces/${props.space.id}`);
+    // Usamos POST con _method: 'PUT' para que soporte la carga de archivos
+    form.post(`/admin/spaces/${props.space.id}`);
 };
 </script>

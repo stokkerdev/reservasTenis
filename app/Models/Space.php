@@ -16,7 +16,8 @@ class Space extends Model
         'capacity',
         'description',
         'price_per_hour',
-        'is_active'
+        'is_active',
+        'image_path'
     ];
 
     public function reservations()
