@@ -37,6 +37,9 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'config' => [
+                'reservation_slot_minutes' => (int) env('RESERVATION_SLOT_MINUTES', 60),
+            ],
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,

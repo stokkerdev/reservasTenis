@@ -270,7 +270,7 @@ class ReservationController extends Controller
         ]);
 
         $date = Carbon::parse($request->input('date'));
-        $intervalMinutes = 60; // Assuming 1-hour blocks
+        $intervalMinutes = (int) env('RESERVATION_SLOT_MINUTES', 60);
 
         $allBlocks = $space->generateTimeBlocks($date, $intervalMinutes);
 

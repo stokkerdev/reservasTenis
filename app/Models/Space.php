@@ -44,8 +44,11 @@ class Space extends Model
      * @param int $intervalMinutes The duration of each block in minutes (e.g., 60 for 1 hour).
      * @return array An array of available time blocks, each with 'start_time' and 'end_time'.
      */
-    public function generateTimeBlocks(Carbon $date, int $intervalMinutes = 60): array
+    public function generateTimeBlocks(Carbon $date, int $intervalMinutes = null): array
     {
+        if ($intervalMinutes === null) {
+            $intervalMinutes = (int) env('RESERVATION_SLOT_MINUTES', 60);
+        }
         $dayOfWeek = $date->dayOfWeek; // 0 for Sunday, 1 for Monday, etc.
         $availableBlocks = [];
 

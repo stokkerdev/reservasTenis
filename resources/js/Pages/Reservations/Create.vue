@@ -210,7 +210,8 @@ const calculateDuration = () => {
     if (!selectedBlock.value) return 0;
     const start = new Date(selectedBlock.value.start_time);
     const end = new Date(selectedBlock.value.end_time);
-    return ((end - start) / (1000 * 60 * 60)).toFixed(1);
+    const durationHours = (end - start) / (1000 * 60 * 60);
+    return durationHours.toFixed(2);
 };
 
 const calculateTotal = () => {
