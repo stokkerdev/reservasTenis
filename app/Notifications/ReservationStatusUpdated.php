@@ -99,14 +99,6 @@ class ReservationStatusUpdated extends Notification
                 'action_url' => url('/reservations/create'),
                 'closing' => 'Lamentamos los inconvenientes y esperamos verte pronto nuevamente.',
             ],
-            'rejected' => [
-                'subject' => 'Reserva rechazada - Club de Tenis',
-                'intro' => 'La administración no pudo aprobar tu reserva.',
-                'message' => 'Por favor intenta seleccionar otro horario disponible o contacta con administración si necesitas más información.',
-                'action_text' => 'Buscar Otro Horario',
-                'action_url' => url('/reservations/create'),
-                'closing' => 'Gracias por tu comprensión.',
-            ],
             default => [
                 'subject' => 'Actualización de reserva - Club de Tenis',
                 'intro' => 'El estado de tu reserva fue actualizado.',
