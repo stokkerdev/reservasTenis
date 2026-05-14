@@ -4,8 +4,16 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Mis Reservas</h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="py-12 relative min-h-screen">
+            <!-- Fondo con imagen de cancha de tenis -->
+            <div class="absolute inset-0 z-0 overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/images/tennis-bg.jpg'); filter: blur(8px);"></div>
+                <!-- Overlay blanquecino semi-transparente -->
+                <div class="absolute inset-0 bg-white/60"></div>
+            </div>
+
+            <!-- Contenido principal con z-index mayor -->
+            <div class="relative z-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <!-- Header con botón crear -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 bg-white border-b border-gray-200 flex justify-between items-center">
