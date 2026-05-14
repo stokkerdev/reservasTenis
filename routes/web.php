@@ -17,6 +17,21 @@ Route::get('/', function () {
     ]);
 });
 
+// Rutas públicas
+Route::get('/terminos', function () {
+    return Inertia::render('TermsOfService');
+})->name('terms');
+
+Route::get('/privacidad', function () {
+    return Inertia::render('PrivacyPolicy');
+})->name('privacy');
+
+Route::get('/contacto', function () {
+    return Inertia::render('Contact');
+})->name('contact');
+
+Route::post('/contacto', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

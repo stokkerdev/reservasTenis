@@ -116,9 +116,9 @@ defineProps({
                     <span class="text-gray-900 font-bold">Reserva Tenis © 2026</span>
                 </div>
                 <div class="flex gap-8 text-gray-500 font-medium">
-                    <a href="#" class="hover:text-tennis-green transition">Términos</a>
-                    <a href="#" class="hover:text-tennis-green transition">Privacidad</a>
-                    <a href="#" class="hover:text-tennis-green transition">Contacto</a>
+                    <Link :href="route('terms')" class="hover:text-tennis-green transition">Términos</Link>
+                    <Link :href="route('privacy')" class="hover:text-tennis-green transition">Privacidad</Link>
+                    <Link :href="route('contact')" class="hover:text-tennis-green transition">Contacto</Link>
                 </div>
             </div>
         </footer>
