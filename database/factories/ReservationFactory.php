@@ -20,10 +20,12 @@ class ReservationFactory extends Factory
         $start = $this->faker->dateTimeBetween('+1 day', '+10 days');
         $end = (clone $start)->modify('+1 hour');
 
-        return [
-            'space_id' => \App\Models\Space::inRandomOrder()->first()->id,
+        $space = \App\Models\Space::inRandomOrder()->first();
+        $user = \App\Models\User::inRandomOrder()->first();
 
-            'user_id' => \App\Models\User::inRandomOrder()->first()->id,
+        return [
+            'space_id' => $space ? $space->id : \App\Models\Space::factory(),
+            'user_id' => $user ? $user->id : \App\Models\User::factory(),
             'start_time' => $start,
             'end_time' => $end,
 
