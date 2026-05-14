@@ -10,6 +10,9 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use App\Notifications\ReservationCreated;
+use App\Notifications\ReservationStatusUpdated;
+use App\Notifications\ReservationCancelled;
 
 class ReservationController extends Controller
 {
@@ -80,6 +83,9 @@ class ReservationController extends Controller
 
         $data['status'] = 'confirmed';
         $reservation = Reservation::create($data);
+
+        // Enviar notificación al usuario
+        auth()->user()->notify(new ReservationCreated($reservation->load('space')));
 
         return response()->json(['message' => 'Reserva creada correctamente.', 'reservation' => $reservation->load('space')], 201);
     }
@@ -193,6 +199,11 @@ class ReservationController extends Controller
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'confirmed']);
 
+        // Notificar al usuario (asumiendo que tiene relación 'user')
+        if ($reservation->user) {
+            $reservation->user->notify(new ReservationStatusUpdated($reservation->load('space')));
+        }
+
         return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
     }
 
@@ -203,6 +214,11 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
         $reservation->update(['status' => 'rejected']);
+
+        // Notificar al usuario
+        if ($reservation->user) {
+            $reservation->user->notify(new ReservationStatusUpdated($reservation->load('space')));
+        }
 
         return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
     }
@@ -230,6 +246,11 @@ class ReservationController extends Controller
         }
 
         $reservation->update(['status' => 'cancelled']);
+
+        // Notificar al usuario
+        if ($reservation->user) {
+            $reservation->user->notify(new ReservationCancelled($reservation->load('space')));
+        }
 
         return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
     }
