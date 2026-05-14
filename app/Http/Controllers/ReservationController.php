@@ -196,15 +196,16 @@ class ReservationController extends Controller
      */
     public function accept($id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::with('user', 'space')->findOrFail($id);
+        $previousStatus = $reservation->status;
+
         $reservation->update(['status' => 'confirmed']);
 
-        // Notificar al usuario (asumiendo que tiene relación 'user')
-        if ($reservation->user) {
-            $reservation->user->notify(new ReservationStatusUpdated($reservation->load('space')));
+        if ($reservation->user && $previousStatus !== 'confirmed') {
+            $reservation->user->notify(new ReservationStatusUpdated($reservation->fresh('space'), $previousStatus, true));
         }
 
-        return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation]);
+        return response()->json(['message' => 'Reserva confirmada', 'reservation' => $reservation->fresh('space')]);
     }
 
     /**
@@ -212,15 +213,16 @@ class ReservationController extends Controller
      */
     public function reject($id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::with('user', 'space')->findOrFail($id);
+        $previousStatus = $reservation->status;
+
         $reservation->update(['status' => 'rejected']);
 
-        // Notificar al usuario
-        if ($reservation->user) {
-            $reservation->user->notify(new ReservationStatusUpdated($reservation->load('space')));
+        if ($reservation->user && $previousStatus !== 'rejected') {
+            $reservation->user->notify(new ReservationStatusUpdated($reservation->fresh('space'), $previousStatus, true));
         }
 
-        return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation]);
+        return response()->json(['message' => 'Reserva rechazada', 'reservation' => $reservation->fresh('space')]);
     }
 
     /**
@@ -228,10 +230,16 @@ class ReservationController extends Controller
      */
     public function setPending($id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::with('user', 'space')->findOrFail($id);
+        $previousStatus = $reservation->status;
+
         $reservation->update(['status' => 'pending']);
 
-        return response()->json(['message' => 'Reserva puesta en pendiente', 'reservation' => $reservation]);
+        if ($reservation->user && $previousStatus !== 'pending') {
+            $reservation->user->notify(new ReservationStatusUpdated($reservation->fresh('space'), $previousStatus, true));
+        }
+
+        return response()->json(['message' => 'Reserva puesta en pendiente', 'reservation' => $reservation->fresh('space')]);
     }
 
     /**
@@ -239,20 +247,26 @@ class ReservationController extends Controller
      */
     public function cancel($id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::with('user', 'space')->findOrFail($id);
 
         if ($reservation->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
             return response()->json(['message' => 'No tienes permiso para cancelar esta reserva.'], 403);
         }
 
+        $previousStatus = $reservation->status;
+        $cancelledByAdmin = auth()->user()->isAdmin() && $reservation->user_id !== auth()->id();
+
         $reservation->update(['status' => 'cancelled']);
 
-        // Notificar al usuario
-        if ($reservation->user) {
-            $reservation->user->notify(new ReservationCancelled($reservation->load('space')));
+        if ($reservation->user && $previousStatus !== 'cancelled') {
+            $notification = $cancelledByAdmin
+                ? new ReservationStatusUpdated($reservation->fresh('space'), $previousStatus, true)
+                : new ReservationCancelled($reservation->fresh('space'));
+
+            $reservation->user->notify($notification);
         }
 
-        return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation]);
+        return response()->json(['message' => 'Reserva cancelada', 'reservation' => $reservation->fresh('space')]);
     }
 
     /**
