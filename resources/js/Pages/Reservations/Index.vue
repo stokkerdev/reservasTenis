@@ -20,13 +20,13 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="overflow-x-auto">
                         <table class="w-full">
-                            <thead class="bg-gray-100 border-b border-gray-200">
+                            <thead class="bg-tennis-green border-b border-green-200 text-white">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Cancha</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Inicio</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Fin</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Estado</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Acciones</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-white">Cancha</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-white">Inicio</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-white">Fin</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-white">Estado</th>
+                                    <th class="px-6 py-3 text-left text-sm font-semibold text-white">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">

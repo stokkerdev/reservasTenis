@@ -74,16 +74,14 @@ defineProps({
                         Reserva tu cancha y <span class="text-tennis-green">domina el juego</span>
                     </h1>
                     <p class="text-xl text-gray-600 mb-10 leading-relaxed">
-                        La plataforma más avanzada para gestionar tus partidas de tenis. Reserva en segundos, encuentra compañeros de juego y mejora tu nivel en nuestras canchas de clase mundial.
+                        Tu mejor plataforma para gestionar tus partidos de tenis. Reserva en segundos y mejora tu nivel en nuestras canchas de clase mundial.
                     </p>
                     
                     <div class="flex flex-wrap gap-4">
                         <Link :href="route('register')" class="px-8 py-4 bg-tennis-green text-white text-lg font-bold rounded-xl shadow-xl hover:bg-green-800 transition transform hover:scale-105">
                             Comenzar Ahora
                         </Link>
-                        <a href="#features" class="px-8 py-4 bg-white text-gray-800 text-lg font-bold rounded-xl border border-gray-200 shadow-sm hover:bg-gray-50 transition">
-                            Saber Más
-                        </a>
+                    
                     </div>
                 </div>
 

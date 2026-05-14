@@ -193,7 +193,7 @@ const formatCurrency = (val) =>
                 <!-- KPIs principales -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Total reservas -->
-                    <div class="bg-white rounded-2xl shadow p-6 border border-gray-100">
+                    <div class="bg-white rounded-2xl shadow p-6 border border-gray-100 border-width-10" >
                         <div class="flex items-center gap-3 mb-3">
                             <div class="bg-tennis-green/10 rounded-full p-3">
                                 <svg class="w-6 h-6 text-tennis-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">

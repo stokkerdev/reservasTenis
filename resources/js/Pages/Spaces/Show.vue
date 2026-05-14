@@ -49,8 +49,8 @@ const getSpaceImage = (path) => {
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ space.name }}
                 </h2>
-                <Link href="/" class="text-tennis-green font-bold hover:underline">
-                    &larr; Volver al listado
+                <Link href="/dashboard" class="text-tennis-green font-bold hover:underline">
+                    &larr; Volver al tablerito
                 </Link>
             </div>
         </template>
@@ -85,7 +85,7 @@ const getSpaceImage = (path) => {
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm text-gray-500 font-bold uppercase">Ubicación</p>
-                                    <p class="text-lg font-bold text-gray-800">{{ space.location || 'Sede Principal' }}</p>
+                                    <p class="text-lg font-bold text-gray-800">{{ space.location || 'Manizales' }}</p>
                                 </div>
                             </div>
                         </div>
