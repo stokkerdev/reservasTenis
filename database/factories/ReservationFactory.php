@@ -17,7 +17,7 @@ class ReservationFactory extends Factory
      */
     public function definition(): array
     {
-        $start = fake()->dateTimeBetween('+1 day', '+10 days');
+        $start = $this->faker->dateTimeBetween('+1 day', '+10 days');
         $end = (clone $start)->modify('+1 hour');
 
         return [
@@ -27,15 +27,15 @@ class ReservationFactory extends Factory
             'start_time' => $start,
             'end_time' => $end,
 
-            'status' => fake()->randomElement([
+            'status' => $this->faker->randomElement([
                 'pending',
                 'confirmed',
                 'cancelled'
             ]),
 
-            'user_name' => fake()->name(),
-            'user_email' => fake()->email(),
-            'notes' => fake()->sentence()
+            'user_name' => $this->faker->name(),
+            'user_email' => $this->faker->email(),
+            'notes' => $this->faker->sentence()
         ];
     }
 }
