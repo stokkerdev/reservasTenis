@@ -27,20 +27,20 @@ const contactMethods = [
     {
         icon: '📞',
         title: 'Teléfono',
-        value: '+34 XXX XXX XXX',
-        description: 'Llámanos de lunes a viernes de 9:00 a 18:00',
+        value: '+57 312 261 3725',
+        description: 'Me llaman el domingo por que entre semana descanso',
     },
     {
         icon: '📧',
         title: 'Correo Electrónico',
-        value: 'info@clubdetenis.com',
-        description: 'Responderemos en 24 horas',
+        value: 'stokkerma@gmail.com',
+        description: 'Respondo apenas pueda.',
     },
     {
         icon: '📍',
         title: 'Ubicación',
-        value: 'Calle Principal 123',
-        description: 'Ciudad, País',
+        value: 'Universidad de Caldas',
+        description: 'Caldas, Manizales',
     },
 ];
 </script>
@@ -80,95 +80,7 @@ const contactMethods = [
                 </div>
             </div>
 
-            <!-- Formulario de Contacto -->
-            <div class="bg-white rounded-lg shadow-md p-8 md:p-12 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-900 mb-8">Envíanos un Mensaje</h2>
-
-                <form @submit.prevent="submitForm" class="space-y-6">
-                    <!-- Nombre -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
-                        <input
-                            id="name"
-                            v-model="form.name"
-                            type="text"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-green"
-                            placeholder="Tu nombre"
-                        />
-                        <p v-if="form.errors.name" class="text-red-500 text-sm mt-1">{{ form.errors.name }}</p>
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
-                        <input
-                            id="email"
-                            v-model="form.email"
-                            type="email"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-green"
-                            placeholder="tu@email.com"
-                        />
-                        <p v-if="form.errors.email" class="text-red-500 text-sm mt-1">{{ form.errors.email }}</p>
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Teléfono (Opcional)</label>
-                        <input
-                            id="phone"
-                            v-model="form.phone"
-                            type="tel"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-green"
-                            placeholder="+34 XXX XXX XXX"
-                        />
-                        <p v-if="form.errors.phone" class="text-red-500 text-sm mt-1">{{ form.errors.phone }}</p>
-                    </div>
-
-                    <!-- Asunto -->
-                    <div>
-                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Asunto</label>
-                        <select
-                            id="subject"
-                            v-model="form.subject"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-green"
-                        >
-                            <option value="">Selecciona un asunto</option>
-                            <option value="reserva">Problema con una reserva</option>
-                            <option value="pago">Problema con el pago</option>
-                            <option value="tecnico">Problema técnico</option>
-                            <option value="sugerencia">Sugerencia o mejora</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                        <p v-if="form.errors.subject" class="text-red-500 text-sm mt-1">{{ form.errors.subject }}</p>
-                    </div>
-
-                    <!-- Mensaje -->
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Mensaje</label>
-                        <textarea
-                            id="message"
-                            v-model="form.message"
-                            required
-                            rows="6"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-green"
-                            placeholder="Cuéntanos cómo podemos ayudarte..."
-                        ></textarea>
-                        <p v-if="form.errors.message" class="text-red-500 text-sm mt-1">{{ form.errors.message }}</p>
-                    </div>
-
-                    <!-- Botón Enviar -->
-                    <button
-                        type="submit"
-                        :disabled="form.processing"
-                        class="w-full bg-tennis-green text-white font-bold py-3 rounded-lg hover:bg-green-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {{ form.processing ? 'Enviando...' : 'Enviar Mensaje' }}
-                    </button>
-                </form>
-            </div>
+         
         </main>
 
         <!-- Footer -->
