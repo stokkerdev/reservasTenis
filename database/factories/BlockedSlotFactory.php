@@ -16,22 +16,23 @@ class BlockedSlotFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-{
-    $start = fake()->dateTimeBetween('+1 day', '+15 days');
-    $end = (clone $start)->modify('+2 hours');
+    {
+        $start = $this->faker->dateTimeBetween('+1 day', '+15 days');
+        $end = (clone $start)->modify('+2 hours');
 
-    return [
-        'space_id' => \App\Models\Space::inRandomOrder()->first()->id,
+        return [
+            'space_id' => \App\Models\Space::inRandomOrder()->first()->id,
 
-        'start_time' => $start,
-        'end_time' => $end,
+            'start_time' => $start,
+            'end_time' => $end,
 
-        'reason' => fake()->randomElement([
-            'Mantenimiento',
-            'Limpieza',
-            'Evento interno',
-            'Inspección'
-        ])
-    ];
-}
+            'reason' => $this->faker->randomElement([
+                'Mantenimiento',
+                'Limpieza',
+                'Evento interno',
+                'Inspección'
+            ])
+        ];
+
+    }
 }

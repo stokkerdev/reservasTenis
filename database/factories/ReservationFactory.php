@@ -33,9 +33,9 @@ class ReservationFactory extends Factory
                 'cancelled'
             ]),
 
-            'user_name' => $this->faker->name(),
-            'user_email' => $this->faker->email(),
-            'notes' => $this->faker->sentence()
+            'user_name' => $this->faker->name,
+            'user_email' => $this->faker->email,
+            'notes' => $this->faker->sentence,
         ];
     }
 }
