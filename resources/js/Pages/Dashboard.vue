@@ -404,7 +404,7 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                             </svg>
                         </div>
                         <h3 class="text-2xl font-black text-gray-900 mb-2">Sin canchas disponibles</h3>
-                        <p class="text-gray-500 font-medium">No encontramos canchas de tipo "{{ filterType }}" en este momento.</p>
+                        <p class="text-gray-500 font-medium">No tenemos disponibles canchas de tipo "{{ filterType }}" en este momento, pero puedes usar otra de nuestras bonitas y bien cuidadas canchas.</p>
                     </div>
                 </div>
 
