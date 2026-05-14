@@ -5,9 +5,8 @@
         </template>
 
         <div class="py-12 relative min-h-screen">
-            <!-- Fondo con imagen de cancha de tenis -->
             <div class="absolute inset-0 z-0 overflow-hidden">
-                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/images/tennis-bg.jpg'); filter: blur(8px);"></div>
+                <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/images/tennis-bg.jpeg'); filter: blur(2px);"></div>
                 <!-- Overlay blanquecino semi-transparente -->
                 <div class="absolute inset-0 bg-white/60"></div>
             </div>
