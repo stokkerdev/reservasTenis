@@ -22,9 +22,17 @@ class AvailabilityController extends Controller
      */
     public function indexWeb()
     {
-        $availabilities = Availability::with('space')->orderBy('day_of_week')->get();
+        $availabilities = Availability::with('space')
+            ->orderBy('space_id')
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+            
+        $spaces = Space::all();
+        
         return Inertia::render('Admin/Availabilities/Index', [
             'availabilities' => $availabilities,
+            'spaces' => $spaces,
         ]);
     }
 

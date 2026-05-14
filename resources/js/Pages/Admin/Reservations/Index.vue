@@ -9,7 +9,32 @@
                 <!-- Filtros -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <div class="flex gap-4 items-end">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <!-- Filtro por Cancha -->
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Cancha</label>
+                                <select
+                                    v-model="filterSpace"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
+                                >
+                                    <option value="">Todas las canchas</option>
+                                    <option v-for="space in spaces" :key="space.id" :value="space.id">
+                                        {{ space.name }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Filtro por Fecha -->
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Fecha</label>
+                                <input
+                                    v-model="filterDate"
+                                    type="date"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tennis-cyan"
+                                />
+                            </div>
+
+                            <!-- Filtro por Estado -->
                             <div class="flex-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Estado</label>
                                 <select
@@ -20,7 +45,18 @@
                                     <option value="pending">Pendiente</option>
                                     <option value="confirmed">Confirmada</option>
                                     <option value="cancelled">Cancelada</option>
+                                    <option value="rejected">Rechazada</option>
                                 </select>
+                            </div>
+
+                            <!-- Botón Limpiar -->
+                            <div class="flex-none">
+                                <button 
+                                    @click="clearFilters"
+                                    class="w-full px-4 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition"
+                                >
+                                    Limpiar Filtros
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -32,18 +68,23 @@
                         <table class="w-full">
                             <thead class="bg-gray-100 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Cancha</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Jugador</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Inicio</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Fin</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Estado</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Acciones</th>
+                                    <th class="px-6 py-3 text-left text-sm font-black text-gray-900 uppercase tracking-wider">Cancha</th>
+                                    <th class="px-6 py-3 text-left text-sm font-black text-gray-900 uppercase tracking-wider">Jugador</th>
+                                    <th class="px-6 py-3 text-left text-sm font-black text-gray-900 uppercase tracking-wider">Inicio</th>
+                                    <th class="px-6 py-3 text-left text-sm font-black text-gray-900 uppercase tracking-wider">Fin</th>
+                                    <th class="px-6 py-3 text-left text-sm font-black text-gray-900 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-3 text-right text-sm font-black text-gray-900 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr v-for="reservation in filteredReservations" :key="reservation.id" class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 text-sm text-gray-900 font-medium">{{ reservation.space?.name }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">{{ reservation.user_name }}</td>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <tr v-for="reservation in filteredReservations" :key="reservation.id" class="hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4 text-sm text-gray-900 font-bold">{{ reservation.space?.name }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600 font-medium">
+                                        <div class="flex flex-col">
+                                            <span>{{ reservation.user_name }}</span>
+                                            <span class="text-xs text-gray-400">{{ reservation.user_email }}</span>
+                                        </div>
+                                    </td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ formatDateTime(reservation.start_time) }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ formatDateTime(reservation.end_time) }}</td>
                                     <td class="px-6 py-4 text-sm">
@@ -51,38 +92,38 @@
                                             {{ getStatusLabel(reservation.status) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <div class="flex flex-wrap gap-2">
+                                    <td class="px-6 py-4 text-sm text-right">
+                                        <div class="flex flex-wrap justify-end gap-2">
                                             <button
                                                 v-if="reservation.status !== 'confirmed'"
                                                 @click="updateStatus(reservation.id, 'accept')"
-                                                class="px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-xs font-bold"
+                                                class="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-xs font-black transition"
                                                 title="Aprobar"
                                             >
-                                                Aprobar
+                                                APROBAR
                                             </button>
                                             <button
                                                 v-if="reservation.status !== 'pending'"
                                                 @click="updateStatus(reservation.id, 'set-pending')"
-                                                class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 text-xs font-bold"
+                                                class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 text-xs font-black transition"
                                                 title="Pendiente"
                                             >
-                                                Pendiente
+                                                PENDIENTE
                                             </button>
                                             <button
                                                 v-if="reservation.status !== 'cancelled'"
                                                 @click="updateStatus(reservation.id, 'cancel')"
-                                                class="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-xs font-bold"
+                                                class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-xs font-black transition"
                                                 title="Cancelar"
                                             >
-                                                Cancelar
+                                                CANCELAR
                                             </button>
                                             <button
                                                 @click="deleteReservation(reservation.id)"
-                                                class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-bold"
+                                                class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xs font-black transition"
                                                 title="Eliminar"
                                             >
-                                                Eliminar
+                                                ELIMINAR
                                             </button>
                                         </div>
                                     </td>
@@ -90,8 +131,12 @@
                             </tbody>
                         </table>
                     </div>
-                    <div v-if="filteredReservations.length === 0" class="p-6 text-center text-gray-500">
-                        No hay reservas que coincidan con los filtros
+                    <div v-if="filteredReservations.length === 0" class="p-12 text-center text-gray-500 bg-gray-50 border-t border-gray-100">
+                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <h4 class="text-lg font-bold text-gray-400">No se encontraron reservas</h4>
+                        <p class="text-gray-400">Intenta cambiar los filtros de búsqueda.</p>
                     </div>
                 </div>
             </div>
@@ -106,14 +151,33 @@ import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     reservations: Array,
+    spaces: Array,
 });
 
 const filterStatus = ref('');
+const filterSpace = ref('');
+const filterDate = ref('');
 
 const filteredReservations = computed(() => {
-    if (!filterStatus.value) return props.reservations;
-    return props.reservations.filter(r => r.status === filterStatus.value);
+    return props.reservations.filter(r => {
+        const matchStatus = !filterStatus.value || r.status === filterStatus.value;
+        const matchSpace = !filterSpace.value || r.space_id === parseInt(filterSpace.value);
+        
+        let matchDate = true;
+        if (filterDate.value) {
+            const reservationDate = new Date(r.start_time).toISOString().split('T')[0];
+            matchDate = reservationDate === filterDate.value;
+        }
+        
+        return matchStatus && matchSpace && matchDate;
+    });
 });
+
+const clearFilters = () => {
+    filterStatus.value = '';
+    filterSpace.value = '';
+    filterDate.value = '';
+};
 
 const formatDateTime = (dateTime) => {
     return new Date(dateTime).toLocaleString('es-AR', {
@@ -127,7 +191,7 @@ const formatDateTime = (dateTime) => {
 };
 
 const getStatusClass = (status) => {
-    const baseClass = 'px-3 py-1 rounded-full text-xs font-semibold';
+    const baseClass = 'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider';
     const statusClasses = {
         'pending': 'bg-yellow-100 text-yellow-800',
         'confirmed': 'bg-green-100 text-green-800',
@@ -157,7 +221,6 @@ const updateStatus = async (reservationId, action) => {
 
     if (confirm(confirmMessages[action])) {
         try {
-            // Usamos las rutas web definidas en web.php
             const response = await fetch(`/admin/reservations/${reservationId}/${action}`, {
                 method: 'POST',
                 headers: {

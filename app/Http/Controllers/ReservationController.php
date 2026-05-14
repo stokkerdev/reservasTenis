@@ -23,15 +23,17 @@ class ReservationController extends Controller
 
     /**
      * Display admin reservations management view.
-     */
-    public function indexWeb()
+     */    public function indexWeb()
     {
         $reservations = Reservation::with('space', 'user')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('start_time', 'desc')
             ->get();
+
+        $spaces = Space::all();
 
         return Inertia::render('Admin/Reservations/Index', [
             'reservations' => $reservations,
+            'spaces' => $spaces,
         ]);
     }
 
