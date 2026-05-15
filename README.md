@@ -89,6 +89,10 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
     php artisan key:generate
     ```
 
+    **Generar el link con storage**
+     ```bash
+    php artisan storage:link
+```
 6.  **Ejecutar Migraciones y Seeders:**
 
     Esto creará las tablas de la base de datos y poblará con datos de prueba, incluyendo un usuario administrador y un usuario normal.
