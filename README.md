@@ -12,8 +12,6 @@
 *   **Panel de Administración:** Interfaz para que los administradores gestionen todos los aspectos de la aplicación.
 *   **Estadísticas de Usuario:** Los usuarios pueden ver un resumen de sus reservas, canchas favoritas y horas de juego.
 *   **Notificaciones por Correo:** Envío de correos automáticos para confirmación, cancelación y cambios de estado de reservas.
-*   **Páginas Informativas:** Secciones de Términos de Servicio, Política de Privacidad y Contacto.
-*   **Almacenamiento en la Nube:** Soporte para almacenamiento de imágenes de canchas en buckets compatibles con S3 (como Cloudflare R2).
 
 ## Requisitos del Sistema
 
@@ -23,7 +21,7 @@ Asegúrate de tener instalados los siguientes componentes en tu entorno de desar
 *   **Composer:** Herramienta de gestión de dependencias para PHP.
 *   **Node.js:** Versión LTS recomendada.
 *   **npm** o **Yarn:** Gestor de paquetes para Node.js.
-*   **Base de Datos:** SQLite (por defecto para desarrollo) o MySQL/PostgreSQL.
+*   **Base de Datos:** pgsql 
 
 ## Instalación
 
@@ -46,8 +44,7 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
 
     ```bash
     npm install
-    # o si usas Yarn
-    # yarn install
+
     ```
 
 4.  **Configurar el Archivo `.env`:**
@@ -58,13 +55,18 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
     cp .env.example .env
     ```
 
-    Abre el archivo `.env` y configura las variables de entorno según tu necesidad. Por defecto, el proyecto usa SQLite para la base de datos, pero puedes cambiarlo a MySQL o PostgreSQL.
+    Abre el archivo `.env` y configura las variables de entorno según tu necesidad. Por defecto, el proyecto usa pgsql
 
-    **Configuración de Base de Datos (SQLite por defecto):**
+    **Configuración de Base de Datos (pgsql por defecto):**
 
     ```env
-    DB_CONNECTION=sqlite
-    # DB_DATABASE=/ruta/a/tu/base_de_datos.sqlite (opcional, si no, se creará en database/database.sqlite)
+    DB_CONNECTION=pgsql
+    DB_HOST=127.0.0.1
+    DB_PORT=5432
+    DB_DATABASE=reservas-tenis
+    DB_USERNAME=postgres
+    DB_PASSWORD=password
+
     ```
 
     **Configuración de Correo (Mailtrap para desarrollo):**
@@ -80,19 +82,6 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
     MAIL_FROM_NAME="Club de Tenis"
     ```
 
-    **Configuración de Almacenamiento en la Nube (para despliegue):**
-
-    Si vas a desplegar en un entorno como Laravel Cloud que usa un bucket compatible con S3 (ej. Cloudflare R2), configura estas variables. De lo contrario, déjalas vacías o con los valores por defecto.
-
-    ```env
-    FILESYSTEM_DISK=s3
-    AWS_ACCESS_KEY_ID=tu_access_key_id
-    AWS_SECRET_ACCESS_KEY=tu_secret_access_key
-    AWS_DEFAULT_REGION=auto # o la región de tu bucket (ej. us-east-1)
-    AWS_BUCKET=tu_nombre_de_bucket
-    AWS_ENDPOINT=tu_endpoint_de_bucket # ej. https://xxxxxxxx.r2.cloudflarestorage.com
-    AWS_USE_PATH_STYLE_ENDPOINT=false
-    ```
 
 5.  **Generar la Clave de Aplicación:**
 
@@ -115,14 +104,6 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
     | Administrador | `admin@tenis.com`     | `admin123`   |
     | Usuario     | `jugador@tenis.com`   | `jugador123` |
 
-7.  **Generar Enlace Simbólico de Almacenamiento (Solo para desarrollo local):**
-
-    Si estás usando el disco `local` para `public` y quieres que las imágenes subidas sean accesibles vía URL, necesitas crear un enlace simbólico.
-
-    ```bash
-    php artisan storage:link
-    ```
-
 ## Uso
 
 Para iniciar el servidor de desarrollo de Laravel y el servidor de Vite (para los assets de Vue.js) simultáneamente, usa el siguiente comando:
@@ -142,7 +123,6 @@ Esto iniciará la aplicación en `http://127.0.0.1:8000` (o el puerto configurad
 *   `inertiajs/inertia-laravel`: `^2.0`
 *   `laravel/jetstream`: `^5.5`
 *   `laravel/sanctum`: `^4.0`
-*   `league/flysystem-aws-s3-v3`: `^3.0` (para soporte de S3/R2)
 *   `railsware/mailtrap-php`: `^3.11` (para desarrollo de correos)
 
 ### Frontend (npm)
@@ -155,17 +135,3 @@ Esto iniciará la aplicación en `http://127.0.0.1:8000` (o el puerto configurad
 *   `chart.js`: `^4.5.1`
 *   `vue-chartjs`: `^5.3.3`
 
-## Despliegue en Laravel Cloud
-
-Para desplegar en Laravel Cloud, asegúrate de que las variables de entorno para el bucket S3/R2 estén configuradas en tu panel de control, tal como se describe en la sección de configuración del archivo `.env`.
-
-El proyecto está configurado para usar el disco `s3` cuando `FILESYSTEM_DISK=s3` en tu `.env` de producción, lo que dirigirá las subidas de archivos directamente a tu bucket de Laravel Cloud.
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
-
----
-
-**Autor:** Manus AI (en representación del desarrollador)
-**Fecha:** 15 de Mayo de 2026

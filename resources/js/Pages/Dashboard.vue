@@ -336,39 +336,85 @@ const hasData = computed(() => props.stats.totalReservations > 0);
                 </transition>
 
                 <!-- Listado de Canchas -->
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-gray-800">Canchas Disponibles</h3>
-                        <div class="flex gap-2">
-                            <button @click="filterType = ''" :class="!filterType ? 'bg-tennis-green text-white' : 'bg-white text-gray-600'" class="px-3 py-1 rounded-lg text-sm font-medium shadow-sm transition">Todas</button>
-                            <button @click="filterType = 'Polvo de Ladrillo'" :class="filterType === 'Polvo de Ladrillo' ? 'bg-tennis-green text-white' : 'bg-white text-gray-600'" class="px-3 py-1 rounded-lg text-sm font-medium shadow-sm transition">Polvo</button>
-                            <button @click="filterType = 'Cemento'" :class="filterType === 'Cemento' ? 'bg-tennis-green text-white' : 'bg-white text-gray-600'" class="px-3 py-1 rounded-lg text-sm font-medium shadow-sm transition">Cemento</button>
-                            <button @click="filterType = 'Césped'" :class="filterType === 'Césped' ? 'bg-tennis-green text-white' : 'bg-white text-gray-600'" class="px-3 py-1 rounded-lg text-sm font-medium shadow-sm transition">Césped</button>
-                        </div>
+                <div class="space-y-6">
+                    <h3 class="text-3xl font-extrabold text-gray-900 text-center">Nuestras Canchas</h3>
+
+                    <!-- Filtros -->
+                    <div class="flex flex-wrap items-center justify-center gap-3">
+                        <button 
+                            @click="filterType = ''"
+                            :class="filterType === '' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Todas
+                        </button>
+                        <button 
+                            @click="filterType = 'cesped'"
+                            :class="filterType === 'cesped' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Césped
+                        </button>
+                        <button 
+                            @click="filterType = 'arcilla'"
+                            :class="filterType === 'arcilla' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Arcilla
+                        </button>
+                        <button 
+                            @click="filterType = 'cemento'"
+                            :class="filterType === 'cemento' ? 'bg-tennis-green text-white shadow-lg scale-105' : 'bg-white text-gray-700 border border-gray-200'"
+                            class="px-8 py-2 rounded-full font-bold transition duration-300"
+                        >
+                            Cemento
+                        </button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div v-for="space in filteredSpaces" :key="space.id" class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-gray-100 group">
-                            <div class="relative h-48 overflow-hidden">
-                                <img :src="getSpaceImage(space.image_path)" :alt="space.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-tennis-green shadow-sm">
+                    <!-- Grid de Canchas -->
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+                        <div v-for="space in filteredSpaces" :key="space.id" class="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 flex flex-col group border border-gray-100">
+                            <!-- Imagen -->
+                            <div class="relative h-64 overflow-hidden">
+                                <img :src="getSpaceImage(space.image_path)" :alt="space.name" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                                <div class="absolute top-5 right-5 bg-white/95 backdrop-blur px-4 py-1.5 rounded-2xl text-tennis-green font-black text-xs shadow-lg uppercase tracking-widest">
                                     {{ space.type }}
                                 </div>
                             </div>
-                            <div class="p-5">
-                                <h4 class="text-lg font-bold text-gray-800 mb-1">{{ space.name }}</h4>
-                                <p class="text-gray-500 text-sm mb-4 line-clamp-2">{{ space.description }}</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-tennis-green font-bold text-xl">{{ formatPrice(space.price_per_hour) }}<span class="text-xs text-gray-400 font-normal">/h</span></span>
-                                    <Link :href="route('reservations.create', { space_id: space.id })" class="bg-tennis-green text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition">
-                                        Reservar
+
+                            <!-- Contenido -->
+                            <div class="p-8 flex-1 flex flex-col">
+                                <h3 class="text-2xl font-black text-gray-900 mb-3 group-hover:text-tennis-green transition duration-300">{{ space.name }}</h3>
+                                <p class="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-3">{{ space.description || 'Disfruta de una experiencia profesional en nuestras instalaciones de primer nivel.' }}</p>
+
+                                <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] text-gray-400 uppercase font-black tracking-[0.2em] mb-1">Precio / Hora</p>
+                                        <p class="text-2xl font-black text-tennis-green">{{ formatPrice(space.price_per_hour) }}</p>
+                                    </div>
+                                    <Link 
+                                        :href="route('spaces.show', { space: space.slug })" 
+                                        class="bg-tennis-cyan text-tennis-green font-black px-6 py-3 rounded-2xl hover:bg-cyan-200 hover:shadow-lg transition duration-300 transform active:scale-95"
+                                    >
+                                        Ver Detalles
                                     </Link>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
+                    <!-- Empty State -->
+                    <div v-if="filteredSpaces.length === 0" class="text-center py-24 bg-white rounded-3xl shadow-inner border border-dashed border-gray-200">
+                        <div class="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-900 mb-2">Sin canchas disponibles</h3>
+                        <p class="text-gray-500 font-medium">No tenemos disponibles canchas de tipo "{{ filterType }}" en este momento, pero puedes usar otra de nuestras bonitas y bien cuidadas canchas.</p>
+                        <p class="text-gray-500 font-medium">No tenemos disponibles canchas de tipo "{{ filterType }}" en este momento, pero puedes usar otra de nuestras bonitas y bien cuidadas ca.</p>
+                    </div>
+</div>
             </div>
         </div>
     </AppLayout>
